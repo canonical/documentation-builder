@@ -24,17 +24,15 @@ def parse_arguments():
 
     parser.add_argument(
         '--source-repository',
-        nargs=1, required=True,
-        help="Git repository URL for retrieving markdown files."
+        required=True, help="Git repository URL for retrieving markdown files."
     )
     parser.add_argument(
         '--files-path',
-        default="src",
-        nargs=1, help="Where to look for files within the repository."
+        default="src", help="Where to look for files within the repository."
     )
     parser.add_argument(
         '--destination-folder',
-        nargs=1, default=".", help="A folder for the compiled HTML files"
+        default=".", help="A folder for the compiled HTML files"
     )
 
     return parser.parse_args()
