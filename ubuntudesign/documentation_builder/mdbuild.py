@@ -34,53 +34,40 @@ doc_nav = ''
 default_title = 'Juju Documentation'
 
 
-def getargs():
-    d_text = """This version of mdbuild is specifically designed for use
-                with the Juju documentation at https://github.com/juju/docs"""
-    parser = argparse.ArgumentParser(description=d_text)
-    parser.add_argument(
-        '--file', nargs=1, dest='file', help="process single file")
-    parser.add_argument(
-        '--source', nargs=1, default='./src/', help="source directory")
-    parser.add_argument(
-        '--log', dest='debug', action='store_true', help="turn on logging")
-    parser.add_argument(
-        '--quiet', dest='quiet', action='store_true', help="disable STDOUT")
-    parser.add_argument(
-        '--todo', dest='todo', action='store_true', help="output TODO.txt")
-    parser.add_argument(
-        '--outpath', nargs=1, default='./htmldocs', help="output path")
-    return (parser.parse_args())
-
-
 def getoutfile(filename, outpath):
     base = os.path.basename(filename)
     base = os.path.splitext(base)[0] + '.html'
     return os.path.join(outpath, base)
 
 
-def main():
+def build(
+    source='./src/',
+    outpath='./htmldocs',
+    filepath=None,
+    debug=False,
+    quiet=None,
+    todo=None
+):
     global doc_template
     global doc_nav
     global args
-    args = getargs()
-    t = codecs.open(os.path.join(args.source, 'base.tpl'), encoding='utf-8')
+    t = codecs.open(os.path.join(source, 'base.tpl'), encoding='utf-8')
     doc_template = t.read()
     t.close()
     t = codecs.open(
-        os.path.join(args.source, 'navigation.tpl'), encoding='utf-8')
+        os.path.join(source, 'navigation.tpl'), encoding='utf-8')
     doc_nav = t.read()
     t.close()
     mdparser = markdown.Markdown(extensions=extlist)
-    if (args.file):
-        p = Page(args.file[0], mdparser)
+    if (filepath):
+        p = Page(filepath[0], mdparser)
         p.convert()
-        p.write(getoutfile(p.filename, args.outpath))
+        p.write(getoutfile(p.filename, outpath))
         print(p.output)
-    elif (args.todo):
-        lang= 'en'
+    elif (todo):
+        lang = 'en'
         out = codecs.open("TODO.txt", "w", encoding='utf-8')
-        src_path = os.path.join(args.source, lang)
+        src_path = os.path.join(source, lang)
         for mdfile in next(os.walk(src_path))[2]:
             if (os.path.splitext(mdfile)[1] == '.md'):
                 p = Page(os.path.join(src_path, mdfile), mdparser)
@@ -90,20 +77,20 @@ def main():
                     for i in p.parser.Meta['todo']:
                         out.write(' - '+i+'\n')
     else:
-        for lang in next(os.walk(args.source))[1]:
-            output_path = os.path.join(args.outpath, lang)
+        for lang in next(os.walk(source))[1]:
+            output_path = os.path.join(outpath, lang)
             if not os.path.exists(output_path):
                 os.makedirs(output_path)
-            src_path = os.path.join(args.source, lang)
+            src_path = os.path.join(source, lang)
             for mdfile in next(os.walk(src_path))[2]:
                 if (os.path.splitext(mdfile)[1] == '.md'):
-                    if not args.quiet:
+                    if not quiet:
                         print("processing: ", mdfile)
                     p = Page(os.path.join(src_path, mdfile), mdparser)
                     p.convert()
                     p.write(getoutfile(p.filename, output_path))
                 else:
-                    if not args.quiet:
+                    if not quiet:
                         print("skipping ", mdfile)
 
 # Classes
