@@ -1,1 +1,6 @@
 Markdown==2.6.6
+GitPython==2.0.8
+mdx-anchors-away==1.0.1
+mdx-callouts==1.0.0
+mdx-foldouts==1.0.0
+
