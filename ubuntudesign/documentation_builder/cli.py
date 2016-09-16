@@ -1,13 +1,24 @@
 # Core modules
 import argparse
 import tempfile
+from contextlib import contextmanager
 from os.path import join
+from shutil import rmtree
 
 # Third party modules
 from git import Repo
 
 # Local modules
 from .mdbuild import build
+
+
+@contextmanager
+def ephemeral_directory():
+    temp_dir = tempfile.mkdtemp(prefix='/dev/shm/')
+    try:
+        yield temp_dir
+    finally:
+        rmtree(temp_dir)
 
 
 def parse_arguments():
@@ -46,13 +57,13 @@ def main():
 
     arguments = parse_arguments()
 
-    source_folder = tempfile.mkdtemp()
-    Repo.clone_from(arguments.source_repository, source_folder)
+    with ephemeral_directory() as temp_source_folder:
+        Repo.clone_from(arguments.source_repository, temp_source_folder)
 
-    build(
-        source=join(source_folder, arguments.files_path.strip('/')),
-        outpath=arguments.destination_folder
-    )
+        build(
+            source=join(temp_source_folder, arguments.files_path.strip('/')),
+            outpath=arguments.destination_folder
+        )
 
 
 if __name__ == "__main__":
