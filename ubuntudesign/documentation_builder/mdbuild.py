@@ -7,7 +7,6 @@ A tool to convert Juju docs markdown -> html
 import os
 import re
 import codecs
-import argparse
 
 # Third party modules
 import markdown
@@ -15,16 +14,16 @@ import markdown
 # config
 
 extlist = [
-           'markdown.extensions.meta',
-           'markdown.extensions.tables',
-           'markdown.extensions.fenced_code',
-           'markdown.extensions.def_list',
-           'markdown.extensions.attr_list',
-           'markdown.extensions.toc',
-           'callouts',
-           'anchors_away',
-           'foldouts'
-          ]
+    'markdown.extensions.meta',
+    'markdown.extensions.tables',
+    'markdown.extensions.fenced_code',
+    'markdown.extensions.def_list',
+    'markdown.extensions.attr_list',
+    'markdown.extensions.toc',
+    'callouts',
+    'anchors_away',
+    'foldouts'
+]
 extcfg = []
 
 # global
@@ -51,41 +50,49 @@ def build(
     global doc_template
     global doc_nav
     global args
-    t = codecs.open(os.path.join(source, 'base.tpl'), encoding='utf-8')
-    doc_template = t.read()
-    t.close()
-    t = codecs.open(
-        os.path.join(source, 'navigation.tpl'), encoding='utf-8')
-    doc_nav = t.read()
-    t.close()
+
+    with open(os.path.join(source, 'base.tpl')) as base_template:
+        doc_template = base_template.read()
+
+    with open(os.path.join(source, 'navigation.tpl')) as nav_template:
+        doc_nav = nav_template.read()
+
     mdparser = markdown.Markdown(extensions=extlist)
+
     if (filepath):
-        p = Page(filepath[0], mdparser)
-        p.convert()
-        p.write(getoutfile(p.filename, outpath))
-        print(p.output)
+        page = Page(filepath[0], mdparser)
+        page.convert()
+        page.write(getoutfile(page.filename, outpath))
+        print(page.output)
     elif (todo):
         lang = 'en'
         out = codecs.open("TODO.txt", "w", encoding='utf-8')
         src_path = os.path.join(source, lang)
         for mdfile in next(os.walk(src_path))[2]:
             if (os.path.splitext(mdfile)[1] == '.md'):
-                p = Page(os.path.join(src_path, mdfile), mdparser)
-                p.convert()
-                if 'todo' in p.parser.Meta:
+                page = Page(os.path.join(src_path, mdfile), mdparser)
+                page.convert()
+
+                if 'todo' in page.parser.Meta:
                     out.write(mdfile+":\n")
-                    for i in p.parser.Meta['todo']:
+
+                    for i in page.parser.Meta['todo']:
                         out.write(' - '+i+'\n')
+
     else:
         for lang in next(os.walk(source))[1]:
             output_path = os.path.join(outpath, lang)
+
             if not os.path.exists(output_path):
                 os.makedirs(output_path)
+
             src_path = os.path.join(source, lang)
+
             for mdfile in next(os.walk(src_path))[2]:
                 if (os.path.splitext(mdfile)[1] == '.md'):
                     if not quiet:
                         print("processing: ", mdfile)
+
                     p = Page(os.path.join(src_path, mdfile), mdparser)
                     p.convert()
                     p.write(getoutfile(p.filename, output_path))
@@ -93,19 +100,18 @@ def build(
                     if not quiet:
                         print("skipping ", mdfile)
 
-# Classes
-
 
 class Page:
 
     """A page of data"""
 
-    def __init__(self, filename, mdparser):
+    def __init__(self, filename, mdparser, base_template=None):
         self.filename = filename
+        self.parser = mdparser
+        self.base_template = base_template
         self.content = ''
         self.parsed = ''
         self.output = ''
-        self.parser = mdparser
         self.load_content()
 
     def load_content(self):
@@ -136,20 +142,24 @@ class Page:
             title = self.parser.Meta['title'][0]
         else:
             title = default_title
-        # copy template
-        self.output = doc_template
 
-        # replace tokens
-        replace = [
-            ('%%TITLE%%', title),
-            ('%%CONTENT%%', self.parsed),
-            ('%%DOCNAV%%', doc_nav),
-            ('src="media/', 'src="../media/'),
-            ('src="./media/', 'src="../media/'),
-            ('code class="', 'code class="language-')
-        ]
-        for pair in replace:
-            self.output = re.sub(pair[0], pair[1], self.output)
+        if self.base_template:
+            self.output = self.base_template
+
+            # replace tokens
+            replace = [
+                ('%%TITLE%%', title),
+                ('%%CONTENT%%', self.parsed),
+                ('%%DOCNAV%%', doc_nav),
+                ('src="media/', 'src="../media/'),
+                ('src="./media/', 'src="../media/'),
+                ('code class="', 'code class="language-')
+            ]
+            for pair in replace:
+                self.output = re.sub(pair[0], pair[1], self.output)
+        else:
+            self.output = self.parsed
+
         self.parser.reset()
 
     def write(self, outfile):
