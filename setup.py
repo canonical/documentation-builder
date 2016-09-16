@@ -16,6 +16,12 @@ setup(
     ),
     scripts=['bin/documentation-builder'],
     # long_description=open('README.md').read(),
-    install_requires=["Markdown>=2.6.0"],
+    install_requires=[
+        "Markdown>=2.6.6",
+        "GitPython>=2.0.8",
+        "mdx-anchors-away>=1.0.1",
+        "mdx-callouts>=1.0.0",
+        "mdx-foldouts>=1.0.0"
+    ],
 )
 
