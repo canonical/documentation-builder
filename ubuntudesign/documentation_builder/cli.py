@@ -34,6 +34,14 @@ def parse_arguments():
         '--destination-folder',
         default=".", help="A folder for the compiled HTML files"
     )
+    parser.add_argument(
+        '--template-path',
+        help="Path to a local wrapper HTML template."
+    )
+    parser.add_argument(
+        '--nav-path',
+        help="Path to a local nav file."
+    )
 
     return parser.parse_args()
 
@@ -51,7 +59,9 @@ def main():
 
         build(
             source=join(temp_source_folder, arguments.files_path.strip('/')),
-            outpath=arguments.destination_folder
+            outpath=arguments.destination_folder,
+            template_path=arguments.template_path,
+            nav_path=arguments.nav_path
         )
 
 

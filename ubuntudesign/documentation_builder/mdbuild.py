@@ -4,9 +4,9 @@ A tool to convert Juju docs markdown -> html
 """
 
 # Core modules
-import os
 import re
 import codecs
+from os import path, makedirs, walk
 
 # Third party modules
 import markdown
@@ -28,49 +28,64 @@ extcfg = []
 
 # global
 args = []
-doc_template = ''
 doc_nav = ''
 default_title = 'Juju Documentation'
 
 
 def getoutfile(filename, outpath):
-    base = os.path.basename(filename)
-    base = os.path.splitext(base)[0] + '.html'
-    return os.path.join(outpath, base)
+    base = path.basename(filename)
+    base = path.splitext(base)[0] + '.html'
+    return path.join(outpath, base)
 
 
 def build(
     source='./src/',
     outpath='./htmldocs',
+    template_path=None,
+    nav_path=None,
     filepath=None,
     debug=False,
     quiet=None,
     todo=None
 ):
-    global doc_template
-    global doc_nav
     global args
 
-    with open(os.path.join(source, 'base.tpl')) as base_template:
-        doc_template = base_template.read()
+    template_path = template_path or path.join(source, 'base.tpl')
 
-    with open(os.path.join(source, 'navigation.tpl')) as nav_template:
-        doc_nav = nav_template.read()
+    with open(template_path) as base_template:
+        template = base_template.read()
+
+    nav_path = nav_path or path.join(source, 'navigation.tpl')
+
+    with open(nav_path) as nav_template:
+        navigation = nav_template.read()
 
     mdparser = markdown.Markdown(extensions=extlist)
 
     if (filepath):
-        page = Page(filepath[0], mdparser)
+        page = Page(
+            filepath[0],
+            mdparser,
+            template,
+            navigation
+        )
         page.convert()
         page.write(getoutfile(page.filename, outpath))
         print(page.output)
+
     elif (todo):
         lang = 'en'
         out = codecs.open("TODO.txt", "w", encoding='utf-8')
-        src_path = os.path.join(source, lang)
-        for mdfile in next(os.walk(src_path))[2]:
-            if (os.path.splitext(mdfile)[1] == '.md'):
-                page = Page(os.path.join(src_path, mdfile), mdparser)
+        src_path = path.join(source, lang)
+
+        for mdfile in next(walk(src_path))[2]:
+            if (path.splitext(mdfile)[1] == '.md'):
+                page = Page(
+                    path.join(src_path, mdfile),
+                    mdparser,
+                    template,
+                    navigation
+                )
                 page.convert()
 
                 if 'todo' in page.parser.Meta:
@@ -80,20 +95,25 @@ def build(
                         out.write(' - '+i+'\n')
 
     else:
-        for lang in next(os.walk(source))[1]:
-            output_path = os.path.join(outpath, lang)
+        for lang in next(walk(source))[1]:
+            output_path = path.join(outpath, lang)
 
-            if not os.path.exists(output_path):
-                os.makedirs(output_path)
+            if not path.exists(output_path):
+                makedirs(output_path)
 
-            src_path = os.path.join(source, lang)
+            src_path = path.join(source, lang)
 
-            for mdfile in next(os.walk(src_path))[2]:
-                if (os.path.splitext(mdfile)[1] == '.md'):
+            for mdfile in next(walk(src_path))[2]:
+                if (path.splitext(mdfile)[1] == '.md'):
                     if not quiet:
                         print("processing: ", mdfile)
 
-                    p = Page(os.path.join(src_path, mdfile), mdparser)
+                    p = Page(
+                        path.join(src_path, mdfile),
+                        mdparser,
+                        template,
+                        navigation
+                    )
                     p.convert()
                     p.write(getoutfile(p.filename, output_path))
                 else:
@@ -105,10 +125,11 @@ class Page:
 
     """A page of data"""
 
-    def __init__(self, filename, mdparser, base_template=None):
+    def __init__(self, filename, mdparser, template, navigation):
         self.filename = filename
         self.parser = mdparser
-        self.base_template = base_template
+        self.template = template
+        self.navigation = navigation
         self.content = ''
         self.parsed = ''
         self.output = ''
@@ -143,29 +164,26 @@ class Page:
         else:
             title = default_title
 
-        if self.base_template:
-            self.output = self.base_template
+        self.output = self.template
 
-            # replace tokens
-            replace = [
-                ('%%TITLE%%', title),
-                ('%%CONTENT%%', self.parsed),
-                ('%%DOCNAV%%', doc_nav),
-                ('src="media/', 'src="../media/'),
-                ('src="./media/', 'src="../media/'),
-                ('code class="', 'code class="language-')
-            ]
-            for pair in replace:
-                self.output = re.sub(pair[0], pair[1], self.output)
-        else:
-            self.output = self.parsed
+        # replace tokens
+        replace = [
+            ('%%TITLE%%', title),
+            ('%%CONTENT%%', self.parsed),
+            ('%%DOCNAV%%', self.navigation),
+            ('src="media/', 'src="../media/'),
+            ('src="./media/', 'src="../media/'),
+            ('code class="', 'code class="language-')
+        ]
+        for pair in replace:
+            self.output = re.sub(pair[0], pair[1], self.output)
 
         self.parser.reset()
 
     def write(self, outfile):
 
-        if not os.path.exists(os.path.dirname(outfile)):
-            os.makedirs(os.path.dirname(outfile))
+        if not path.exists(path.dirname(outfile)):
+            makedirs(path.dirname(outfile))
         file = codecs.open(outfile, "w", encoding="utf-8",
                            errors="xmlcharrefreplace")
         file.write(self.output)
