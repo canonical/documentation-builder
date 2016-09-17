@@ -25,15 +25,15 @@ def parse_arguments():
         required=True, help="Git repository URL for retrieving markdown files."
     )
     parser.add_argument(
+        '--source-branch', help="The branch to clone."
+    )
+    parser.add_argument(
         '--media-destination',
         required=True,
         help=(
             "An alternate location to place media inside the "
             "destination folder."
         )
-    )
-    parser.add_argument(
-        '--source-branch', help="The branch to clone."
     )
     parser.add_argument(
         '--build-path',
