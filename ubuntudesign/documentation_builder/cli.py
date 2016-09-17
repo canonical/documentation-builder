@@ -59,6 +59,11 @@ def parse_arguments():
         '--relative-media-destination',
         help="Relative path to media for built documents."
     )
+    parser.add_argument(
+        '--use-html-extension-in-links',
+        default=True,
+        help="Use HTML extension when referring to other documents internally."
+    )
 
     return parser.parse_args()
 

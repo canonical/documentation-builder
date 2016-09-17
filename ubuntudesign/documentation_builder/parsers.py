@@ -1,4 +1,5 @@
 # Core modules
+import re
 from glob import iglob
 from os import makedirs, path
 from tempfile import TemporaryDirectory
@@ -71,7 +72,8 @@ def parse_files(
     navigation,
     media_path,
     media_destination,
-    relative_media_destination
+    relative_media_destination,
+    use_html_extension_in_links
 ):
     """
     Given a folder of markdown files,
@@ -111,6 +113,10 @@ def parse_files(
             relative_media_path,
             relative_media_destination
         )
+        if use_html_extension_in_links:
+            re.sub(r'(href="(?! *http).*)\.md"', '\1.html', html_document)
+        else:
+            re.sub(r'(href="(?! *http).*)\.md"', '\1', html_document)
 
         with open(output_path, 'w') as output_file:
             output_file.write(html_document)
@@ -127,7 +133,8 @@ def parse_docs_repo(
     files_folder,
     media_folder,
     media_destination,
-    relative_media_destination
+    relative_media_destination,
+    use_html_extension_in_links
 ):
     """
     Parse a remote git repository of markdown files into HTML files in the
@@ -161,5 +168,6 @@ def parse_docs_repo(
             navigation,
             media_path,
             media_destination,
-            relative_media_destination
+            relative_media_destination,
+            use_html_extension_in_links
         )
