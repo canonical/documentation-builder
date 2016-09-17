@@ -135,13 +135,13 @@ def parse_docs_repo(
     """
 
     with TemporaryDirectory() as repo_folder:
+        print("Cloning {source_repository}".format(**locals()))
         if source_branch:
             Repo.clone_from(
                 source_repository, repo_folder, branch=source_branch
             )
         else:
             Repo.clone_from(source_repository, repo_folder)
-        print("Cloned {source_repository}".format(**locals()))
 
         source_path = path.join(repo_folder, files_folder.strip('/'))
         media_path = path.join(repo_folder, media_folder.strip('/'))
