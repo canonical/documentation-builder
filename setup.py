@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='ubuntudesign.documentation-builder',
-    version='0.0.3',
+    version='0.1.0',
     author='Canonical webteam',
     author_email='robin+pypi@canonical.com',
     url='https://github.com/ubuntudesign/documentation-builder',
