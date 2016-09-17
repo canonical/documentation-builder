@@ -55,6 +55,10 @@ def parse_arguments():
         '--media-folder',
         default="media", help="Where to look for media."
     )
+    parser.add_argument(
+        '--relative-media-destination',
+        help="Relative path to media for built documents."
+    )
 
     return parser.parse_args()
 

@@ -1,16 +1,14 @@
 # Core modules
 from glob import iglob
-from os import listdir, makedirs, path, stat
-from shutil import copytree, copy2
+from os import makedirs, path
 from tempfile import TemporaryDirectory
 
 # Third party modules
+import markdown
 from git import Repo
 
-# Core modules
-
-# Third party modules
-import markdown
+# Local modules
+from .utilities import mergetree
 
 # Configuration
 # ==
@@ -28,23 +26,12 @@ markdown_extensions = [
 ]
 
 
-def mergetree(src, dst, symlinks=False, ignore=None):
-    if not path.exists(dst):
-        makedirs(dst)
-    for item in listdir(src):
-        source = path.join(src, item)
-        destination = path.join(dst, item)
-        if path.isdir(source):
-            copytree(source, destination, symlinks, ignore)
-        else:
-            if (
-                not path.exists(destination) or
-                stat(source).st_mtime - stat(destination).st_mtime > 1
-            ):
-                copy2(source, destination)
-
-
 def parse_file(filepath):
+    """
+    Parse an individual markdown file to HTML, also returning
+    the meta title
+    """
+
     with open(filepath) as markdown_file:
         parser = markdown.Markdown(extensions=markdown_extensions)
 
@@ -58,16 +45,19 @@ def parse_file(filepath):
 
 
 def parse_template(template, contents, title, navigation):
+    """
+    Given a template string with `%%CONTENT%%`, '%%TITLE%%' and '%%DOCNAV%%'
+    placeholders, add content, title and navigation.
+    """
+
     html_document = template
 
     replace = [
         ('%%TITLE%%', title),
         ('%%CONTENT%%', contents),
-        ('%%DOCNAV%%', navigation),
-        ('src="media/', 'src="../media/'),
-        ('src="./media/', 'src="../media/'),
-        ('code class="', 'code class="language-')
+        ('%%DOCNAV%%', navigation)
     ]
+
     for (original, replacement) in replace:
         html_document = html_document.replace(original, replacement)
 
@@ -81,11 +71,13 @@ def parse_files(
     navigation,
     media_path,
     media_destination,
-    filepath=None,
-    debug=False,
-    quiet=None,
-    todo=None
+    relative_media_destination
 ):
+    """
+    Given a folder of markdown files,
+    parse all files into a new folder of HTML files
+    """
+
     search = path.join(source_path, '**/*.md')
 
     # Copy media into destination
@@ -97,10 +89,12 @@ def parse_files(
         local_path = filepath.replace(source_path, '').strip('/')
         output_path = path.join(destination_path, local_path)[:-3] + '.html'
         relative_media_path = path.relpath(media_path, path.dirname(filepath))
-        relative_media_destination = path.relpath(
-            media_destination,
-            path.dirname(output_path)
-        )
+
+        if not relative_media_destination:
+            relative_media_destination = path.relpath(
+                media_destination,
+                path.dirname(output_path)
+            )
 
         # Check folder exists
         makedirs(path.dirname(output_path), exist_ok=True)
@@ -132,7 +126,8 @@ def parse_docs_repo(
     nav_path,
     files_folder,
     media_folder,
-    media_destination
+    media_destination,
+    relative_media_destination
 ):
     """
     Parse a remote git repository of markdown files into HTML files in the
@@ -165,5 +160,6 @@ def parse_docs_repo(
             template,
             navigation,
             media_path,
-            media_destination
+            media_destination,
+            relative_media_destination
         )
