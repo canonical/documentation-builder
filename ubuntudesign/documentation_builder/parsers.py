@@ -73,7 +73,7 @@ def parse_files(
     media_path,
     media_destination,
     relative_media_destination,
-    use_html_extension_in_links
+    no_link_extensions
 ):
     """
     Given a folder of markdown files,
@@ -103,20 +103,34 @@ def parse_files(
 
         # Parse the markdown
         (title, html_contents) = parse_file(filepath)
+
+        # Build document from template
         html_document = parse_template(
             template,
             html_contents,
             title,
             navigation
         )
+
+        # Replace media links
         html_document = html_document.replace(
             relative_media_path,
             relative_media_destination
         )
-        if use_html_extension_in_links:
-            re.sub(r'(href="(?! *http).*)\.md"', '\1.html', html_document)
+
+        # Replace internal document links
+        if no_link_extensions:
+            html_document = re.sub(
+                r'(href="(?! *http).*)\.md',
+                r'\1',
+                html_document
+            )
         else:
-            re.sub(r'(href="(?! *http).*)\.md"', '\1', html_document)
+            html_document = re.sub(
+                r'(href="(?! *http).*)\.md',
+                r'\1.html',
+                html_document
+            )
 
         with open(output_path, 'w') as output_file:
             output_file.write(html_document)
@@ -125,8 +139,8 @@ def parse_files(
 
 
 def parse_docs_repo(
-    source_repository,
-    source_branch,
+    repository,
+    branch,
     build_path,
     template_path,
     nav_path,
@@ -134,7 +148,7 @@ def parse_docs_repo(
     media_folder,
     media_destination,
     relative_media_destination,
-    use_html_extension_in_links
+    no_link_extensions
 ):
     """
     Parse a remote git repository of markdown files into HTML files in the
@@ -142,13 +156,11 @@ def parse_docs_repo(
     """
 
     with TemporaryDirectory() as repo_folder:
-        print("Cloning {source_repository}".format(**locals()))
-        if source_branch:
-            Repo.clone_from(
-                source_repository, repo_folder, branch=source_branch
-            )
+        print("Cloning {repository}".format(**locals()))
+        if branch:
+            Repo.clone_from(repository, repo_folder, branch=branch)
         else:
-            Repo.clone_from(source_repository, repo_folder)
+            Repo.clone_from(repository, repo_folder)
 
         source_path = path.join(repo_folder, files_folder.strip('/'))
         media_path = path.join(repo_folder, media_folder.strip('/'))
@@ -169,5 +181,5 @@ def parse_docs_repo(
             media_path,
             media_destination,
             relative_media_destination,
-            use_html_extension_in_links
+            no_link_extensions
         )

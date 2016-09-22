@@ -21,11 +21,11 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        '--source-repository',
+        '--repository',
         required=True, help="Git repository URL for retrieving markdown files."
     )
     parser.add_argument(
-        '--source-branch', help="The branch to clone."
+        '--branch', help="The branch to clone."
     )
     parser.add_argument(
         '--media-destination',
@@ -60,9 +60,10 @@ def parse_arguments():
         help="Relative path to media for built documents."
     )
     parser.add_argument(
-        '--use-html-extension-in-links',
-        default=True,
-        help="Use HTML extension when referring to other documents internally."
+        '--no-link-extensions',
+        action='store_true',
+        default=False,
+        help="Don't use .html extensions in internal links."
     )
 
     return parser.parse_args()
