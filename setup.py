@@ -10,7 +10,7 @@ assert sys.version_info >= (3, 5), (
 
 setup(
     name='ubuntudesign.documentation-builder',
-    version='0.2.0',
+    version='0.2.1',
     author='Canonical webteam',
     author_email='robin+pypi@canonical.com',
     url='https://github.com/ubuntudesign/documentation-builder',
@@ -23,7 +23,7 @@ setup(
         'https://github.com/juju/docs/blob/master/tools/mdbuild.py.'
     ),
     scripts=['bin/documentation-builder'],
-    # long_description=open('README.md').read(),
+    long_description=open('README.md').read(),
     install_requires=[
         "Markdown>=2.6.6",
         "GitPython>=2.0.8",
