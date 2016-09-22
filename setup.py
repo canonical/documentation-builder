@@ -1,4 +1,12 @@
+import sys
 from setuptools import setup
+
+# The importer relies heavily on glob recursive search capability.
+# This was only introduced in Python 3.5:
+# https://docs.python.org/3.6/whatsnew/3.5.html#glob
+assert sys.version_info >= (3, 5), (
+    "The documentation importer requires Python 3.5 or newer"
+)
 
 setup(
     name='ubuntudesign.documentation-builder',
@@ -24,4 +32,3 @@ setup(
         "mdx-foldouts>=1.0.0"
     ],
 )
-
