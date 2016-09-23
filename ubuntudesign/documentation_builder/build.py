@@ -125,7 +125,7 @@ class Builder:
             self.source_media_path,
             path.dirname(source_filepath)
         )
-        html_document = html_document.replace(old_media_path, media_url)
+        html_document = html_document.replace(old_media_path, self.media_url)
 
         # Replace internal document links
         if self.no_link_extensions:
