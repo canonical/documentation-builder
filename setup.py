@@ -10,7 +10,7 @@ assert sys.version_info >= (3, 5), (
 
 setup(
     name='ubuntudesign.documentation-builder',
-    version='0.2.1',
+    version='0.3.0',
     author='Canonical webteam',
     author_email='robin+pypi@canonical.com',
     url='https://github.com/ubuntudesign/documentation-builder',
@@ -25,12 +25,13 @@ setup(
     scripts=['bin/documentation-builder'],
     long_description=open('README.md').read(),
     install_requires=[
-        "GitPython>=2.0.8",
+        "GitPython==2.0.8",
         "Jinja2==2.8",
-        "Markdown>=2.6.6",
-        "mdx-anchors-away>=1.0.1",
-        "mdx-callouts>=1.0.0",
-        "mdx-foldouts>=1.0.0",
-        "python-frontmatter>=0.2.1"
+        "Markdown==2.6.6",
+        "mdx-anchors-away==1.0.1",
+        "mdx-callouts==1.0.0",
+        "mdx-foldouts==1.0.0",
+        "python-frontmatter==0.2.1"
+        "PyYAML==3.12",
     ],
 )
