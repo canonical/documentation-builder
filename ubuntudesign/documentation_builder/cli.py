@@ -39,12 +39,12 @@ def parse_arguments():
         help="Path to the folder containing markdown files (default: .)"
     )
     parser.add_argument(
-        '--source-media-path',
+        '--source-media-dir',
         default="media",
         help="Path to the folder containing media files (default: ./media)"
     )
     parser.add_argument(
-        '--source-context-path',
+        '--source-context-file',
         default="context.yaml",
         help="A file containing the context object for building the templates"
     )
@@ -54,7 +54,7 @@ def parse_arguments():
         help="Destination path for the built HTML files (default: .)"
     )
     parser.add_argument(
-        '--output-media-path',
+        '--output-media-dir',
         default="media",
         help="Where to put media files (default: ./media)"
     )
@@ -67,15 +67,6 @@ def parse_arguments():
         help=(
             "Prefix for linking to media inside the built HTML files "
             "(default: Relative path to built media location, e.g.: ../media)"
-        )
-    )
-    parser.add_argument(
-        '--nav-link-prefix',
-        help=(
-            "A prefix to place before navigation links when "
-            "building HTML, e.g. '/docs/'."
-            "This will be made available as "
-            "{{ nav_link_prefix}} inside the template."
         )
     )
     parser.add_argument(

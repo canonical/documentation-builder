@@ -4,6 +4,7 @@ import tempfile
 from copy import deepcopy
 from glob import iglob
 from os import makedirs, path
+from shutil import rmtree
 
 # Third party modules
 import frontmatter
@@ -59,13 +60,11 @@ class Builder:
         self,
         source_path,
         source_media_path,
-        source_context_path,
         output_path,
         output_media_path,
         template,
         global_context,
         media_url,
-        nav_link_prefix,
         no_link_extensions
     ):
         self.source_path = source_path
@@ -75,7 +74,6 @@ class Builder:
         self.template = template
         self.global_context = global_context
         self.media_url = media_url
-        self.nav_link_prefix = nav_link_prefix
         self.no_link_extensions = no_link_extensions
 
     def build_files(self):
@@ -119,7 +117,7 @@ class Builder:
         # Replace media links
         if not self.media_url:
             output_dir = path.dirname(output_filepath)
-            media_url = path.relpath(self.output_media_path, output_dir)
+            self.media_url = path.relpath(self.output_media_path, output_dir)
 
         old_media_path = path.relpath(
             self.source_media_path,
@@ -153,7 +151,6 @@ class Builder:
 
         local_context = deepcopy(self.global_context)
         local_context.update(metadata)
-        local_context['nav_link_prefix'] = self.nav_link_prefix
         local_context['content'] = html_contents
 
         return local_context
@@ -163,13 +160,12 @@ def build(
     repository,
     branch,
     source_path,
-    source_media_path,
-    source_context_path,
+    source_media_dir,
+    source_context_file,
     output_path,
-    output_media_path,
+    output_media_dir,
     template_path,
     media_url,
-    nav_link_prefix,
     no_link_extensions
 ):
     with open(template_path or default_template) as template_file:
@@ -177,29 +173,32 @@ def build(
 
     if repository:
         repo_dir = tempfile.mkdtemp()
-        print("Cloning {repository} into".format(**locals()))
+        print("Cloning {repository} into {repo_dir}".format(**locals()))
         if branch:
             Repo.clone_from(repository, repo_dir, branch=branch)
         else:
             Repo.clone_from(repository, repo_dir)
 
         source_path = path.join(repo_dir, source_path)
-        source_media_path = path.join(repo_dir, source_media_path)
-        source_context_path = path.join(repo_dir, source_context_path)
+        source_media_dir = path.join(repo_dir, source_media_dir)
+        source_context_file = path.join(repo_dir, source_context_file)
 
-    with open(source_context_path) as context_file:
+    with open(source_context_file) as context_file:
         global_context = yaml.load(context_file)
 
-    builder = Builder(
-        source_path=source_path,
-        source_media_path=source_media_path,
-        source_context_path=source_context_path,
-        output_path=output_path,
-        output_media_path=output_media_path,
-        template=template,
-        global_context=global_context,
-        media_url=media_url,
-        nav_link_prefix=nav_link_prefix,
-        no_link_extensions=no_link_extensions
-    )
-    builder.build_files()
+    try:
+        builder = Builder(
+            source_path=source_path,
+            source_media_path=source_media_dir,
+            output_path=output_path,
+            output_media_path=path.join(output_path, output_media_dir),
+            template=template,
+            global_context=global_context,
+            media_url=media_url,
+            no_link_extensions=no_link_extensions
+        )
+        builder.build_files()
+    finally:
+        if repository:
+            print("Cleaning up {repo_dir}".format(**locals()))
+            rmtree(repo_dir)
