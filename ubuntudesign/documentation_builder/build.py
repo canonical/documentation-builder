@@ -112,7 +112,7 @@ class Builder:
         (html_contents, metadata) = parse_markdown(source_filepath)
 
         # Build document from template
-        local_context = self.build_context(html_contents, metadata, local_path)
+        local_context = self.build_context(html_contents, metadata)
         html_document = self.template.render(local_context)
 
         # Replace media links
@@ -145,7 +145,7 @@ class Builder:
 
         print("Created {output_filepath}".format(**locals()))
 
-    def build_context(self, html_contents, metadata, local_path):
+    def build_context(self, html_contents, metadata):
         """
         Construct the template context for an individual page
         """
@@ -153,36 +153,6 @@ class Builder:
         local_context = deepcopy(self.global_context)
         local_context.update(metadata)
         local_context['content'] = html_contents
-
-        def fix_links(items):
-            """
-            Recursive function to find all "location" keys in navigation items
-            and point to relative URLs
-            """
-
-            for item in items:
-                if 'location' in item and item['location'].startswith('/'):
-                    (
-                        scheme, netloc, url_path, query, fragment
-                    ) = urlsplit(item['location'])
-
-                    local_dir = path.dirname('/' + local_path)
-                    prefix = path.relpath(path.dirname(url_path), local_dir)
-
-                    if prefix == '.':
-                        url_path = url_path.replace(local_dir + '/', '')
-                    else:
-                        url_path = prefix + url_path
-
-                    item['location'] = urlunsplit(
-                        (scheme, netloc, url_path, query, fragment)
-                    )
-
-                if 'children' in item:
-                    fix_links(item['children'])
-
-        if 'navigation' in local_context:
-            fix_links(local_context['navigation'])
 
         return local_context
 
