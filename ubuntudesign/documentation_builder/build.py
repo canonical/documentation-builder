@@ -118,10 +118,11 @@ class Builder:
         # Replace media links
         if not self.media_url:
             output_dir = path.dirname(output_filepath)
-            media_url = path.relpath(output_dir, self.output_media_path)
+            media_url = path.relpath(self.output_media_path, output_dir)
+
         old_media_path = path.relpath(
-            path.dirname(source_filepath),
-            self.source_media_path
+            self.source_media_path,
+            path.dirname(source_filepath)
         )
         html_document = html_document.replace(old_media_path, media_url)
 
