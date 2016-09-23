@@ -5,7 +5,7 @@ from os import getcwd
 from glob import glob
 
 # Local modules
-from .parsers import parse_docs_repo
+from .build import build
 
 
 def parse_arguments():
@@ -15,55 +15,64 @@ def parse_arguments():
 
     parser = argparse.ArgumentParser(
         description=(
-            "A tool to build documentation HTML files from markdown files "
-            "stored in a repository somewhere"
+            "A tool to build documentation HTML files from markdown files, "
+            "either from a local directory or a remote repository."
         )
     )
 
     parser.add_argument(
         '--repository',
-        required=True, help="Git repository URL for retrieving markdown files."
-    )
-    parser.add_argument(
-        '--branch', help="The branch to clone."
-    )
-    parser.add_argument(
-        '--media-destination',
-        required=True,
         help=(
-            "An alternate location to place media inside the "
-            "destination folder."
+            "Build files from a remote repository instead of a local folder"
         )
     )
     parser.add_argument(
-        '--build-path',
-        default=".", help="A folder for the compiled HTML files"
+        '--branch',
+        help=(
+            "Pull from an alternative branch to the default"
+            "Only valid with --repository."
+        )
+    )
+    parser.add_argument(
+        '--source-path',
+        default=".",
+        help="Path to the folder containing markdown files (default: .)"
+    )
+    parser.add_argument(
+        '--source-media-path',
+        default="media",
+        help="Path to the folder containing media files (default: ./media)"
+    )
+    parser.add_argument(
+        '--source-context-path',
+        default="context.yaml",
+        help="A file containing the context object for building the templates"
+    )
+    parser.add_argument(
+        '--output-path',
+        default=".",
+        help="Destination path for the built HTML files (default: .)"
+    )
+    parser.add_argument(
+        '--output-media-path',
+        default="media",
+        help="Where to put media files (default: ./media)"
     )
     parser.add_argument(
         '--template-path',
-        help="Path to a local wrapper HTML template."
+        help="Path to an alternate wrapping template for the built HTML files"
     )
     parser.add_argument(
-        '--nav-path',
-        help="Path to a local nav file."
-    )
-    parser.add_argument(
-        '--files-folder',
-        default="src", help="Where to look for files within the repository."
-    )
-    parser.add_argument(
-        '--media-folder',
-        default="media", help="Where to look for media."
-    )
-    parser.add_argument(
-        '--relative-media-destination',
-        help="Relative path to media for built documents."
+        '--media-url',
+        help=(
+            "Prefix for linking to media inside the built HTML files "
+            "(default: Relative path to built media location, e.g.: ../media)"
+        )
     )
     parser.add_argument(
         '--no-link-extensions',
         action='store_true',
-        default=False,
-        help="Don't use .html extensions in internal links."
+        help="Don't include '.html' extension in internal links"
     )
 
     return parser.parse_args()
@@ -90,7 +99,7 @@ def main():
     """
 
     arguments = parse_arguments()
-    parse_docs_repo(**vars(arguments))
+    build(**vars(arguments))
 
 
 if __name__ == "__main__":
