@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+  <head>
+    <title>{{ title }}</title>
+
+    <meta charset="UTF-8" />
+    <meta name="description" content="MAAS" />
+    <meta name="keywords" content="MAAS, cloud, deployment, puppet, chef, fuel, cloud tools, service management, cloud management, configuration management, linux tool, openstack tool, ubuntu, cloud design, cloud orchestration" />
+    <meta name="author" content="Canonical" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+
+  <body>
+    <nav>
+      <ul>
+        {% for item in navigation %}
+        <li>
+          <a href="{{ item.navigation }}">{{ item.title }}</a>
+
+          {% if item.children %}
+          <ul>
+            {% for child in item.children %}
+            <li>
+              <a href="{{ child.location }}">{{ child.title }}</a>
+
+              {% if child.children %}
+              <ul>
+                {% for grandchild in child.children %}
+                <li>
+                  <a href="{{ grandchild.location }}">{{ grandchild.title }}</a>
+                </li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </nav>
+
+    <main>{{ content }}</main>
+  </body>
+</html>
