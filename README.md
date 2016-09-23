@@ -17,20 +17,23 @@ Usage
 The basic usage will build the markdown files from a remote repository in the standard format into the local directory:
 
 ``` bash
-$ documentation-builder --source-repository git@github.com:juju/docs.git --media-destination media
+$ documentation-builder  # Build markdown documentation from the current directory
+# or
+$ documentation-builder --repository git@github.com:juju/docs.git  # Build documentation from remote repository
 ```
 
-There are many options for more advanced usage:
+Optional arguments:
 
 ``` bash
 $ documentation-builder \
-    --repository git@github.com:juju/docs.git  `# Where to pull the markdown files from`
-    --branch new-version                       `# To pull from a different branch than the default`
-    --build-path build                         `# Where to place the built files`
-    --media-destination build/media            `# Where to place the media files from the repository`
-    --template-path wrapper.tpl                `# Path to an alternate wrapping template for the build HTML files`
-    --nav-path nav.html                        `# Path to an alternative navigation than the one provided in the repository`
-    --files-folder docs                        `# An alternative location inside the repository to look for markdown files (default: src)`
-    --media-folder media                       `# An alternative location inside the repository to look for media files (default: media)`
-    --relative-media-destination               `# A URL base for linking to media inside the built HTML files (defaults to relative path to built media location - e.g.: ../media)`
-    --no-link-extensions                       `# Don't include '.html' extension in internal links`
+    --repository {repository-url}     `# A source repository. If provided, all source paths will be relative to this repository root`
+    --branch {branch-name}            `# Pull from an alternative branch to the default (only valid with --repository)`
+    --source-path {dirpath}           `# Path to the folder containing markdown files (default: .)`
+    --source-media-path {dirpath}     `# Path to the folder containing media files (default: ./media)`
+    --source-context-path {filepath}  `# A file containing the context object for building the templates`
+    --output-path {dirpath}           `# Destination path for the built HTML files (default: .)`
+    --output-media-path {dirpath}     `# Where to put media files (default: ./media)`
+    --template-path {filepath}        `# Path to an alternate wrapping template for the built HTML files`
+    --media-url {prefix}              `# Prefix for linking to media inside the built HTML files (default: Relative path to built media location, e.g.: ../media)`
+    --no-link-extensions              `# Don't include '.html' extension in internal links`
+```
