@@ -15,19 +15,23 @@
       <ul>
         {% for item in navigation %}
         <li>
-          <a href="{{ item.navigation }}">{{ item.title }}</a>
+          {% if item.location %}
+          <a href="{{ nav_link_prefix }}{{ item.location }}">{{ item.title }}</a>
+          {% else %}
+          <h4>{{ item.title }}</h4>
+          {% endif %}
 
           {% if item.children %}
           <ul>
             {% for child in item.children %}
             <li>
-              <a href="{{ child.location }}">{{ child.title }}</a>
+              <a href="{{ nav_link_prefix }}{{ child.location }}">{{ child.title }}</a>
 
               {% if child.children %}
               <ul>
                 {% for grandchild in child.children %}
                 <li>
-                  <a href="{{ grandchild.location }}">{{ grandchild.title }}</a>
+                  <a href="{{ nav_link_prefix }}{{ grandchild.location }}">{{ grandchild.title }}</a>
                 </li>
                 {% endfor %}
               </ul>

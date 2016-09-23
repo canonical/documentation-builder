@@ -70,6 +70,15 @@ def parse_arguments():
         )
     )
     parser.add_argument(
+        '--nav-link-prefix',
+        help=(
+            "A prefix to place before navigation links when "
+            "building HTML, e.g. '/docs/'."
+            "This will be made available as "
+            "{{ nav_link_prefix}} inside the template."
+        )
+    )
+    parser.add_argument(
         '--no-link-extensions',
         action='store_true',
         help="Don't include '.html' extension in internal links"

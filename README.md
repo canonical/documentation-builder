@@ -35,5 +35,6 @@ $ documentation-builder \
     --output-media-path {dirpath}     `# Where to put media files (default: ./media)`
     --template-path {filepath}        `# Path to an alternate wrapping template for the built HTML files`
     --media-url {prefix}              `# Prefix for linking to media inside the built HTML files (default: Relative path to built media location, e.g.: ../media)`
+    --nav-link-prefix {prefix}        `# A prefix to place before navigation links when building HTML, e.g. '/docs/'`
     --no-link-extensions              `# Don't include '.html' extension in internal links`
 ```

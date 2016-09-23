@@ -66,6 +66,7 @@ class Builder:
         template,
         global_context,
         media_url,
+        nav_link_prefix,
         no_link_extensions
     ):
         self.source_path = source_path
@@ -75,6 +76,7 @@ class Builder:
         self.template = template
         self.global_context = global_context
         self.media_url = media_url
+        self.nav_link_prefix = nav_link_prefix
         self.no_link_extensions = no_link_extensions
 
     def build_files(self):
@@ -152,6 +154,7 @@ class Builder:
 
         local_context = deepcopy(self.global_context)
         local_context.update(metadata)
+        local_context['nav_link_prefix'] = self.nav_link_prefix
         local_context['content'] = html_contents
 
         return local_context
@@ -167,6 +170,7 @@ def build(
     output_media_path,
     template_path,
     media_url,
+    nav_link_prefix,
     no_link_extensions
 ):
     with open(template_path or default_template) as template_file:
@@ -196,6 +200,7 @@ def build(
         template=template,
         global_context=global_context,
         media_url=media_url,
+        nav_link_prefix=nav_link_prefix,
         no_link_extensions=no_link_extensions
     )
     builder.build_files()
