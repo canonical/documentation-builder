@@ -180,16 +180,14 @@ def build(
             Repo.clone_from(repository, repo_dir)
 
         source_path = path.join(repo_dir, source_path)
-        source_media_dir = path.join(repo_dir, source_media_dir)
-        source_context_file = path.join(repo_dir, source_context_file)
 
-    with open(source_context_file) as context_file:
+    with open(path.join(source_path, source_context_file)) as context_file:
         global_context = yaml.load(context_file)
 
     try:
         builder = Builder(
             source_path=source_path,
-            source_media_path=source_media_dir,
+            source_media_path=path.join(source_path, source_media_dir),
             output_path=output_path,
             output_media_path=path.join(output_path, output_media_dir),
             template=template,
