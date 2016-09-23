@@ -4,7 +4,6 @@ import tempfile
 from copy import deepcopy
 from glob import iglob
 from os import makedirs, path
-from urllib.parse import urlsplit, urlunsplit
 
 # Third party modules
 import frontmatter
