@@ -1,5 +1,6 @@
 # Core modules
 import re
+import sys
 import tempfile
 from copy import deepcopy
 from glob import iglob
@@ -181,8 +182,15 @@ def build(
 
         source_path = path.join(repo_dir, source_path)
 
-    with open(path.join(source_path, source_context_file)) as context_file:
-        global_context = yaml.load(context_file)
+    if path.isfile(source_context_file):
+        with open(path.join(source_path, source_context_file)) as context_file:
+            global_context = yaml.load(context_file) or {}
+    else:
+        print(
+            "Warning: Context file {} not found".format(source_context_file),
+            file=sys.stderr
+        )
+        global_context = {}
 
     try:
         builder = Builder(
