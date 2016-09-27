@@ -83,12 +83,22 @@ class Builder:
         parse all files into a new folder of HTML files
         """
 
-        if path.relpath(self.source_media_path, self.output_media_path) != '.':
-            mergetree(self.source_media_path, self.output_media_path)
-            print(
-                "Copied {} to {}".format(
-                    self.source_media_path, self.output_media_path
+        if path.isdir(self.source_media_path):
+            if path.relpath(
+                self.source_media_path, self.output_media_path
+            ) != '.':
+                mergetree(self.source_media_path, self.output_media_path)
+                print(
+                    "Copied {} to {}".format(
+                        self.source_media_path, self.output_media_path
+                    )
                 )
+        else:
+            print(
+                "Warning: Media directory not found at {}.".format(
+                    self.source_media_path
+                ),
+                file=sys.stderr
             )
 
         for filepath in iglob(
