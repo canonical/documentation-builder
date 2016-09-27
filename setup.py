@@ -16,7 +16,7 @@ except(IOError, ImportError):
 
 setup(
     name='ubuntudesign.documentation-builder',
-    version='0.3.1',
+    version='0.3.2',
     author='Canonical webteam',
     author_email='robin+pypi@canonical.com',
     url='https://github.com/ubuntudesign/documentation-builder',
