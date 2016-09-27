@@ -13,6 +13,8 @@ import markdown
 import yaml
 from git import Repo
 from jinja2 import Template
+from yaml.scanner import ScannerError
+from yaml.parser import ParserError
 
 # Local modules
 from .utilities import mergetree
@@ -45,10 +47,37 @@ def parse_markdown(filepath):
     """
 
     markdown_parser = markdown.Markdown(extensions=markdown_extensions)
-    file_parts = frontmatter.load(filepath)
-    html_content = markdown_parser.convert(file_parts.content)
 
-    return (html_content, file_parts.metadata)
+    metadata = {}
+
+    # Try to extract frontmatter metadata
+    try:
+        file_parts = frontmatter.load(filepath)
+        metadata = file_parts.metadata
+        markdown_content = file_parts.content
+    except (ScannerError, ParserError):
+        """
+        If there's a parsererror, it may be because there is no YAML
+        frontmatter, so it got confused. Let's just continue.
+        """
+
+        with open(filepath) as markdown_file:
+            markdown_content = markdown_file.read()
+
+    html_content = markdown_parser.convert(markdown_content)
+
+    # Now add on any multimarkdown-format metadata
+    if hasattr(markdown_parser, 'Meta'):
+        # Restructure markdown parser metadata to the same format as we expect
+        markdown_meta = markdown_parser.Meta
+
+        for name, value in markdown_meta.items():
+            if type(value) == list and len(value) == 1:
+                markdown_meta[name] = value[0]
+
+        metadata.update(markdown_meta)
+
+    return (html_content, metadata)
 
 
 class Builder:
