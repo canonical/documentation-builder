@@ -91,7 +91,10 @@ class Builder:
                 )
             )
 
-        for filepath in iglob(path.join(self.source_path, '**/*.md')):
+        for filepath in iglob(
+            path.join(self.source_path, '**/*.md'),
+            recursive=True
+        ):
             self.build_file(filepath)
 
     def build_file(self, source_filepath):
