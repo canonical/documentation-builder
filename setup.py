@@ -1,5 +1,9 @@
+# Core
 import sys
 from setuptools import setup
+
+# Third party
+import pypandoc
 
 # The importer relies heavily on glob recursive search capability.
 # This was only introduced in Python 3.5:
@@ -7,14 +11,6 @@ from setuptools import setup
 assert sys.version_info >= (3, 5), (
     "The documentation importer requires Python 3.5 or newer"
 )
-
-try:
-    import pypandoc
-    long_description = pypandoc.convert('README.md', 'rst')
-except(IOError, ImportError):
-    long_description = open('README.md').read()
-
-import ipdb; ipdb.set_trace()
 
 setup(
     name='ubuntudesign.documentation-builder',
@@ -34,7 +30,7 @@ setup(
         'https://github.com/juju/docs/blob/master/tools/mdbuild.py.'
     ),
     scripts=['bin/documentation-builder'],
-    long_description=long_description,
+    long_description=pypandoc.convert('README.md', 'rst'),
     install_requires=[
         "GitPython==2.0.8",
         "Jinja2==2.8",
