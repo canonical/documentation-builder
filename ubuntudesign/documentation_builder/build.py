@@ -170,7 +170,8 @@ def build(
     output_media_dir,
     template_path,
     media_url,
-    no_link_extensions
+    no_link_extensions,
+    no_cleanup
 ):
     with open(template_path or default_template) as template_file:
         template = Template(template_file.read())
@@ -185,8 +186,9 @@ def build(
 
         source_path = path.join(repo_dir, source_path)
 
-    if path.isfile(source_context_file):
-        with open(path.join(source_path, source_context_file)) as context_file:
+    context_path = path.join(source_path, source_context_file)
+    if path.isfile(context_path):
+        with open(context_path) as context_file:
             global_context = yaml.load(context_file) or {}
     else:
         print(
@@ -208,6 +210,6 @@ def build(
         )
         builder.build_files()
     finally:
-        if repository:
+        if repository and not no_cleanup:
             print("Cleaning up {repo_dir}".format(**locals()))
             rmtree(repo_dir)

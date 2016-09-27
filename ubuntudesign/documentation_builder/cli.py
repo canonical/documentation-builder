@@ -73,6 +73,11 @@ def parse_arguments():
         action='store_true',
         help="Don't include '.html' extension in internal links"
     )
+    parser.add_argument(
+        '--no-cleanup',
+        action='store_true',
+        help="Don't clean up temporary directory after cloning repository"
+    )
 
     arguments = parser.parse_args()
 
