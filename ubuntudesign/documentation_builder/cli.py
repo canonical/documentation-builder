@@ -35,7 +35,6 @@ def parse_arguments():
     )
     parser.add_argument(
         '--source-path',
-        default=".",
         help="Path to the folder containing markdown files (default: .)"
     )
     parser.add_argument(
@@ -75,7 +74,17 @@ def parse_arguments():
         help="Don't include '.html' extension in internal links"
     )
 
-    return parser.parse_args()
+    arguments = parser.parse_args()
+
+    if not arguments.source_path:
+        if not arguments.repository:
+            parser.error(
+                "At least one of --repository or --source-path is required."
+            )
+        else:
+            arguments.source_path = '.'
+
+    return arguments
 
 
 def preprocess_files(dir_path, preprocessor_string):
