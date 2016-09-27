@@ -8,6 +8,12 @@ assert sys.version_info >= (3, 5), (
     "The documentation importer requires Python 3.5 or newer"
 )
 
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+except(IOError, ImportError):
+    long_description = open('README.md').read()
+
 setup(
     name='ubuntudesign.documentation-builder',
     version='0.3.1',
@@ -26,7 +32,7 @@ setup(
         'https://github.com/juju/docs/blob/master/tools/mdbuild.py.'
     ),
     scripts=['bin/documentation-builder'],
-    long_description=open('README.md').read(),
+    long_description=long_description,
     install_requires=[
         "GitPython==2.0.8",
         "Jinja2==2.8",
