@@ -14,9 +14,11 @@ try:
 except(IOError, ImportError):
     long_description = open('README.md').read()
 
+import ipdb; ipdb.set_trace()
+
 setup(
     name='ubuntudesign.documentation-builder',
-    version='0.3.2',
+    version='0.3.4',
     author='Canonical webteam',
     author_email='robin+pypi@canonical.com',
     url='https://github.com/ubuntudesign/documentation-builder',
