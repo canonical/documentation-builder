@@ -17,6 +17,9 @@ setup(
     packages=[
         'ubuntudesign.documentation_builder',
     ],
+    package_data={
+        'ubuntudesign.documentation_builder': ['resources/*']
+    },
     description=(
         'A command-line tool for building documentation from repositories '
         'into HTML files. Initially based on '
