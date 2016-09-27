@@ -17,7 +17,7 @@ Usage
 The basic usage will build the markdown files from a remote repository in the standard format into the local directory:
 
 ``` bash
-$ documentation-builder  # Build markdown documentation from the current directory
+$ documentation-builder --source-path .  # Build markdown documentation from the current directory
 # or
 $ documentation-builder --repository git@github.com:juju/docs.git  # Build documentation from remote repository
 ```
