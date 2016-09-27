@@ -113,9 +113,11 @@ class Builder:
         """
 
         if path.isdir(self.source_media_path):
-            if path.relpath(
+            media_paths_match = path.relpath(
                 self.source_media_path, self.output_media_path
-            ) != '.':
+            ) == '.'
+
+            if not media_paths_match:
                 mergetree(self.source_media_path, self.output_media_path)
                 print(
                     "Copied {} to {}".format(
