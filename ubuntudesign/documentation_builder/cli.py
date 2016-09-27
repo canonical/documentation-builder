@@ -49,7 +49,7 @@ def parse_arguments():
     )
     parser.add_argument(
         '--output-path',
-        default=".",
+        default="html",
         help="Destination path for the built HTML files (default: .)"
     )
     parser.add_argument(
