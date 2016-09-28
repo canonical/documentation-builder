@@ -1,7 +1,7 @@
 # Core modules
 import argparse
 import sys
-from os import getcwd
+from os import getcwd, path
 from glob import glob
 
 # Local modules
@@ -54,9 +54,8 @@ def parse_arguments():
         help="Destination path for the built HTML files (default: .)"
     )
     parser.add_argument(
-        '--output-media-dir',
-        default="media",
-        help="Where to put media files (default: ./media)"
+        '--output-media-path',
+        help="Where to put media files (default: ./build/media)"
     )
     parser.add_argument(
         '--template-path',
@@ -80,7 +79,12 @@ def parse_arguments():
         help="Don't clean up temporary directory after cloning repository"
     )
 
-    return parser.parse_args()
+    arguments = parser.parse_args()
+
+    if not arguments.output_media_path:
+        arguments.output_media_path = path.join(arguments.source_path, 'media')
+
+    return arguments
 
 
 def preprocess_files(dir_path, preprocessor_string):
