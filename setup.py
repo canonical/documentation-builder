@@ -2,9 +2,6 @@
 import sys
 from setuptools import setup
 
-# Third party
-import pypandoc
-
 # The importer relies heavily on glob recursive search capability.
 # This was only introduced in Python 3.5:
 # https://docs.python.org/3.6/whatsnew/3.5.html#glob
@@ -30,7 +27,7 @@ setup(
         'https://github.com/juju/docs/blob/master/tools/mdbuild.py.'
     ),
     scripts=['bin/documentation-builder'],
-    long_description=pypandoc.convert('README.md', 'rst'),
+    long_description=open('README.rst').read(),
     install_requires=[
         "GitPython==2.0.8",
         "Jinja2==2.8",

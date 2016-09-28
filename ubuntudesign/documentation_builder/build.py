@@ -1,5 +1,6 @@
 # Core modules
 import re
+import sys
 import tempfile
 from copy import deepcopy
 from glob import iglob
@@ -12,6 +13,8 @@ import markdown
 import yaml
 from git import Repo
 from jinja2 import Template
+from yaml.scanner import ScannerError
+from yaml.parser import ParserError
 
 # Local modules
 from .utilities import mergetree
@@ -44,10 +47,37 @@ def parse_markdown(filepath):
     """
 
     markdown_parser = markdown.Markdown(extensions=markdown_extensions)
-    file_parts = frontmatter.load(filepath)
-    html_content = markdown_parser.convert(file_parts.content)
 
-    return (html_content, file_parts.metadata)
+    metadata = {}
+
+    # Try to extract frontmatter metadata
+    try:
+        file_parts = frontmatter.load(filepath)
+        metadata = file_parts.metadata
+        markdown_content = file_parts.content
+    except (ScannerError, ParserError):
+        """
+        If there's a parsererror, it may be because there is no YAML
+        frontmatter, so it got confused. Let's just continue.
+        """
+
+        with open(filepath) as markdown_file:
+            markdown_content = markdown_file.read()
+
+    html_content = markdown_parser.convert(markdown_content)
+
+    # Now add on any multimarkdown-format metadata
+    if hasattr(markdown_parser, 'Meta'):
+        # Restructure markdown parser metadata to the same format as we expect
+        markdown_meta = markdown_parser.Meta
+
+        for name, value in markdown_meta.items():
+            if type(value) == list and len(value) == 1:
+                markdown_meta[name] = value[0]
+
+        metadata.update(markdown_meta)
+
+    return (html_content, metadata)
 
 
 class Builder:
@@ -82,15 +112,30 @@ class Builder:
         parse all files into a new folder of HTML files
         """
 
-        if path.relpath(self.source_media_path, self.output_media_path) != '.':
-            mergetree(self.source_media_path, self.output_media_path)
-            print(
-                "Copied {} to {}".format(
-                    self.source_media_path, self.output_media_path
+        if path.isdir(self.source_media_path):
+            media_paths_match = path.relpath(
+                self.source_media_path, self.output_media_path
+            ) == '.'
+
+            if not media_paths_match:
+                mergetree(self.source_media_path, self.output_media_path)
+                print(
+                    "Copied {} to {}".format(
+                        self.source_media_path, self.output_media_path
+                    )
                 )
+        else:
+            print(
+                "Warning: Media directory not found at {}.".format(
+                    self.source_media_path
+                ),
+                file=sys.stderr
             )
 
-        for filepath in iglob(path.join(self.source_path, '**/*.md')):
+        for filepath in iglob(
+            path.join(self.source_path, '**/*.md'),
+            recursive=True
+        ):
             self.build_file(filepath)
 
     def build_file(self, source_filepath):
@@ -166,7 +211,8 @@ def build(
     output_media_dir,
     template_path,
     media_url,
-    no_link_extensions
+    no_link_extensions,
+    no_cleanup
 ):
     with open(template_path or default_template) as template_file:
         template = Template(template_file.read())
@@ -181,8 +227,16 @@ def build(
 
         source_path = path.join(repo_dir, source_path)
 
-    with open(path.join(source_path, source_context_file)) as context_file:
-        global_context = yaml.load(context_file)
+    context_path = path.join(source_path, source_context_file)
+    if path.isfile(context_path):
+        with open(context_path) as context_file:
+            global_context = yaml.load(context_file) or {}
+    else:
+        print(
+            "Warning: Context file {} not found".format(source_context_file),
+            file=sys.stderr
+        )
+        global_context = {}
 
     try:
         builder = Builder(
@@ -197,6 +251,6 @@ def build(
         )
         builder.build_files()
     finally:
-        if repository:
+        if repository and not no_cleanup:
             print("Cleaning up {repo_dir}".format(**locals()))
             rmtree(repo_dir)
