@@ -35,6 +35,7 @@ def parse_arguments():
     )
     parser.add_argument(
         '--source-path',
+        default='.',
         help="Path to the folder containing markdown files (default: .)"
     )
     parser.add_argument(
@@ -49,7 +50,7 @@ def parse_arguments():
     )
     parser.add_argument(
         '--output-path',
-        default=".",
+        default="build",
         help="Destination path for the built HTML files (default: .)"
     )
     parser.add_argument(
@@ -79,17 +80,7 @@ def parse_arguments():
         help="Don't clean up temporary directory after cloning repository"
     )
 
-    arguments = parser.parse_args()
-
-    if not arguments.source_path:
-        if not arguments.repository:
-            parser.error(
-                "At least one of --repository or --source-path is required."
-            )
-        else:
-            arguments.source_path = '.'
-
-    return arguments
+    return parser.parse_args()
 
 
 def preprocess_files(dir_path, preprocessor_string):

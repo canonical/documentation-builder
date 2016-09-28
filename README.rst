@@ -19,7 +19,7 @@ in the standard format into the local directory:
 
 .. code:: bash
 
-    $ documentation-builder --source-path .  # Build markdown documentation from the current directory
+    $ documentation-builder  # Build markdown documentation from the current directory
     # or
     $ documentation-builder --repository git@github.com:juju/docs.git  # Build documentation from remote repository
 
@@ -33,7 +33,7 @@ Optional arguments:
         --source-path {dirpath}           `# Path to the folder containing markdown files (default: .)`
         --source-media-dir {dirpath}      `# Path to the folder containing media files (default: ./media)`
         --source-context-file {filepath}  `# A file containing the context object for building the templates (default: ./context.yaml)`
-        --output-path {dirpath}           `# Destination path for the built HTML files (default: .)`
+        --output-path {dirpath}           `# Destination path for the built HTML files (default: ./build)`
         --output-media-dir {dirpath}      `# Where to put media files (default: ./media)`
         --template-path {filepath}        `# Path to an alternate wrapping template for the built HTML files`
         --media-url {prefix}              `# Prefix for linking to media inside the built HTML files (default: Relative path to built media location, e.g.: ../media)`
