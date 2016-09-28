@@ -39,3 +39,4 @@ Optional arguments:
         --media-url {prefix}              `# Prefix for linking to media inside the built HTML files (default: Relative path to built media location, e.g.: ../media)`
         --no-link-extensions              `# Don't include '.html' extension in internal links`
         --no-cleanup                      `# Don't clean up temporary directory after cloning repository`
+        --ignore-file                     `# Filename of a markdown files to ignore and not parse into HTML. Can be declared multiple times. (default: README.md)`
