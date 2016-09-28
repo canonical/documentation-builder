@@ -3,6 +3,7 @@ import argparse
 import sys
 from os import getcwd, path
 from glob import glob
+import pkg_resources
 
 # Local modules
 from .build import build
@@ -88,8 +89,21 @@ def parse_arguments():
             "Can be declared multiple times."
         )
     )
+    parser.add_argument(
+        '--version',
+        action='store_true',
+        help="Show the currently installed version"
+    )
 
     arguments = parser.parse_args()
+
+    if arguments.version:
+        print(
+            pkg_resources.get_distribution(
+                "ubuntudesign.documentation_builder"
+            ).version
+        )
+        sys.exit()
 
     if not arguments.output_media_path:
         arguments.output_media_path = path.join(arguments.source_path, 'media')
