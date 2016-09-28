@@ -95,18 +95,22 @@ def parse_arguments():
         help="Show the currently installed version"
     )
 
-    arguments = parser.parse_args()
+    arguments = vars(parser.parse_args())
 
-    if arguments.version:
+    if arguments['version']:
         print(
             pkg_resources.get_distribution(
                 "ubuntudesign.documentation_builder"
             ).version
         )
         sys.exit()
+    else:
+        del arguments['version']
 
-    if not arguments.output_media_path:
-        arguments.output_media_path = path.join(arguments.source_path, 'media')
+    if not arguments['output_media_path']:
+        arguments['output_media_path'] = path.join(
+            arguments['source_path'], 'media'
+        )
 
     return arguments
 
@@ -132,7 +136,7 @@ def main():
     """
 
     arguments = parse_arguments()
-    build(**vars(arguments))
+    build(**arguments)
 
 
 if __name__ == "__main__":

@@ -95,7 +95,8 @@ class Builder:
         template,
         global_context,
         media_url,
-        no_link_extensions
+        no_link_extensions,
+        ignore_files
     ):
         self.source_path = source_path
         self.source_media_path = source_media_path
@@ -137,11 +138,10 @@ class Builder:
             path.join(self.source_path, '**/*.md'),
             recursive=True
         ):
-            for ignore_name in ignore_files:
-                if ('/' + filepath).endswith(ignore_name):
-                    continue
-
-            self.build_file(filepath)
+            if path.basename(filepath) in self.ignore_files:
+                print("Ignored {}".format(filepath))
+            else:
+                self.build_file(filepath)
 
     def build_file(self, source_filepath):
         """
