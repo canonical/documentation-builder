@@ -34,7 +34,7 @@ Optional arguments:
         --source-media-dir {dirpath}      `# Path to the folder containing media files (default: ./media)`
         --source-context-file {filepath}  `# A file containing the context object for building the templates (default: ./context.yaml)`
         --output-path {dirpath}           `# Destination path for the built HTML files (default: ./build)`
-        --output-media-dir {dirpath}      `# Where to put media files (default: ./media)`
+        --output-media-path {dirpath}     `# Where to put media files (default: ./build/media)`
         --template-path {filepath}        `# Path to an alternate wrapping template for the built HTML files`
         --media-url {prefix}              `# Prefix for linking to media inside the built HTML files (default: Relative path to built media location, e.g.: ../media)`
         --no-link-extensions              `# Don't include '.html' extension in internal links`
