@@ -109,7 +109,7 @@ def parse_arguments():
 
     if not arguments['output_media_path']:
         arguments['output_media_path'] = path.join(
-            arguments['source_path'], 'media'
+            arguments['output_path'], 'media'
         )
 
     return arguments
