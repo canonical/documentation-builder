@@ -93,7 +93,6 @@ class Builder:
         output_path,
         output_media_path,
         template,
-        global_context,
         media_url,
         no_link_extensions,
         ignore_files
@@ -103,15 +102,36 @@ class Builder:
         self.output_path = output_path
         self.output_media_path = output_media_path
         self.template = template
-        self.global_context = global_context
         self.media_url = media_url
         self.no_link_extensions = no_link_extensions
         self.ignore_files = ignore_files
 
-    def build_files(self):
+    def build(self):
+        """
+        Entrypoint: Build documentation folder
+        """
+
+        self._copy_media()
+        self._build_files()
+
+    def _build_files(self):
         """
         Given a folder of markdown files,
         parse all files into a new folder of HTML files
+        """
+
+        for filepath in iglob(
+            path.join(self.source_path, '**/*.md'),
+            recursive=True
+        ):
+            if path.basename(filepath) in self.ignore_files:
+                print("Ignored {}".format(filepath))
+            else:
+                self._build_file(filepath)
+
+    def _copy_media(self):
+        """
+        Copy media files from source_media_path to output_media_path
         """
 
         if path.isdir(self.source_media_path):
@@ -134,46 +154,73 @@ class Builder:
                 file=sys.stderr
             )
 
-        for filepath in iglob(
-            path.join(self.source_path, '**/*.md'),
-            recursive=True
-        ):
-            if path.basename(filepath) in self.ignore_files:
-                print("Ignored {}".format(filepath))
-            else:
-                self.build_file(filepath)
-
-    def build_file(self, source_filepath):
+    def _build_file(self, source_filepath):
         """
         Create an HTML file for a documentation page from a path to the
         corresponding Markdown file
         """
 
-        # Get output filepath
-        local_path = path.relpath(source_filepath, self.source_path)
-        output_filepath = path.join(self.output_path, local_path)
-        output_filepath = re.sub(r'\.md$', '.html', output_filepath)
+        # Get HTML
+        html_document = self._build_html(source_filepath)
 
-        # Check folder exists
-        makedirs(path.dirname(output_filepath), exist_ok=True)
+        # Decide output filepath
+        local_path = path.relpath(source_filepath, self.source_path)
+
+        output_filepath = re.sub(
+            r'\.md$',
+            '.html',
+            path.join(self.output_path, local_path)
+        )
+
+        html_document = self._replace_media_links(
+            html_document,
+            source_filepath,
+            output_filepath
+        )
+
+        # Write output to file
+        self._write_file(html_document, output_filepath)
+
+    def _build_html(self, source_filepath):
+        """
+        Parse markdown file with template to output full HTML markup
+        """
 
         # Parse the markdown
-        (html_contents, metadata) = parse_markdown(source_filepath)
+        (html_content, metadata) = parse_markdown(source_filepath)
 
         # Build document from template
-        local_context = self.build_context(html_contents, metadata)
+        local_context = self._build_context(path.dirname(source_filepath))
+        local_context.update(metadata)
+        local_context['content'] = html_content
         html_document = self.template.render(local_context)
 
-        # Replace media links
-        if not self.media_url:
-            output_dir = path.dirname(output_filepath)
-            self.media_url = path.relpath(self.output_media_path, output_dir)
+        html_document = self._replace_internal_links(html_document)
 
-        old_media_path = path.relpath(
-            self.source_media_path,
-            path.dirname(source_filepath)
-        )
-        html_document = html_document.replace(old_media_path, self.media_url)
+        return html_document
+
+    def _build_context(self, local_path):
+        """
+        Construct the template context for an individual page,
+        by finding and merging all context.yaml files from this folder to the
+        documentation root
+        """
+
+        local_context = {}
+
+        context_match = '{root}/**/context.yaml'.format(root=self.source_path)
+
+        for context_filepath in iglob(context_match, recursive=True):
+            if local_path.startswith(path.dirname(context_filepath)):
+                with open(context_filepath) as context_file:
+                    local_context.update(yaml.load(context_file))
+
+        return local_context
+
+    def _replace_internal_links(self, html_document):
+        """
+        Swap out links to local .md files with the correct filenames
+        """
 
         # Replace internal document links
         if self.no_link_extensions:
@@ -189,21 +236,43 @@ class Builder:
                 html_document
             )
 
+        return html_document
+
+    def _replace_media_links(
+        self,
+        html_document,
+        source_filepath,
+        output_filepath
+    ):
+        """
+        Swap out old links to media with a path to the new location
+        """
+
+        relative_media_path = path.relpath(
+            self.output_media_path,
+            path.dirname(output_filepath)
+        )
+        media_url = self.media_url or relative_media_path
+
+        old_media_path = path.relpath(
+            self.source_media_path,
+            path.dirname(source_filepath)
+        )
+
+        return html_document.replace(old_media_path, media_url)
+
+    def _write_file(self, html_document, output_filepath):
+        """
+        Create the output file with the HTML contents
+        """
+
+        # Check folder exists
+        makedirs(path.dirname(output_filepath), exist_ok=True)
+
         with open(output_filepath, 'w') as output_file:
             output_file.write(html_document)
 
         print("Created {output_filepath}".format(**locals()))
-
-    def build_context(self, html_contents, metadata):
-        """
-        Construct the template context for an individual page
-        """
-
-        local_context = deepcopy(self.global_context)
-        local_context.update(metadata)
-        local_context['content'] = html_contents
-
-        return local_context
 
 
 def build(
@@ -211,7 +280,6 @@ def build(
     branch,
     source_path,
     source_media_dir,
-    source_context_file,
     output_path,
     output_media_path,
     template_path,
@@ -233,17 +301,6 @@ def build(
 
         source_path = path.join(repo_dir, source_path)
 
-    context_path = path.join(source_path, source_context_file)
-    if path.isfile(context_path):
-        with open(context_path) as context_file:
-            global_context = yaml.load(context_file) or {}
-    else:
-        print(
-            "Warning: Context file {} not found".format(source_context_file),
-            file=sys.stderr
-        )
-        global_context = {}
-
     try:
         builder = Builder(
             source_path=source_path,
@@ -251,12 +308,12 @@ def build(
             output_path=output_path,
             output_media_path=output_media_path,
             template=template,
-            global_context=global_context,
             media_url=media_url,
             no_link_extensions=no_link_extensions,
             ignore_files=ignore_files
         )
-        builder.build_files()
+        builder.build()
+
     finally:
         if repository and not no_cleanup:
             print("Cleaning up {repo_dir}".format(**locals()))

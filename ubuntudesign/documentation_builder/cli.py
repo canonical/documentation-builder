@@ -45,11 +45,6 @@ def parse_arguments():
         help="Path to the folder containing media files (default: ./media)"
     )
     parser.add_argument(
-        '--source-context-file',
-        default="context.yaml",
-        help="A file containing the context object for building the templates"
-    )
-    parser.add_argument(
         '--output-path',
         default="build",
         help="Destination path for the built HTML files (default: .)"
