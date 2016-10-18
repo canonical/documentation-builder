@@ -6,7 +6,7 @@ from glob import glob
 import pkg_resources
 
 # Local modules
-from .build import build
+from .builder import build
 
 
 def parse_arguments():
