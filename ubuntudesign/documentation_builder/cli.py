@@ -6,7 +6,7 @@ from glob import glob
 import pkg_resources
 
 # Local modules
-from .build import build
+from .builder import build
 
 
 def parse_arguments():
@@ -43,11 +43,6 @@ def parse_arguments():
         '--source-media-dir',
         default="media",
         help="Path to the folder containing media files (default: ./media)"
-    )
-    parser.add_argument(
-        '--source-context-file',
-        default="context.yaml",
-        help="A file containing the context object for building the templates"
     )
     parser.add_argument(
         '--output-path',
