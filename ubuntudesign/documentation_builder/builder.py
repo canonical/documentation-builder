@@ -353,7 +353,7 @@ class Builder:
         media_url = self.media_url or new_media_path
 
         content = re.sub(
-            r'\b{}\b'.format(original_media_path),
+            r'\b{}(?=/)'.format(original_media_path.replace('.', '\.')),
             r'{}'.format(media_url),
             content
         )
