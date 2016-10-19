@@ -342,23 +342,23 @@ class Builder:
         Swap out old links to media with a path to the new location
         """
 
-        relative_media_path = path.relpath(
-            self.output_media_path,
-            path.dirname(output_filepath)
-        )
-        media_url = self.media_url or relative_media_path
-        old_media_path = path.relpath(
+        original_media_path = path.relpath(
             self.source_media_path,
             path.dirname(source_filepath)
         )
+        new_media_path = path.relpath(
+            self.output_media_path,
+            path.dirname(output_filepath)
+        )
+        media_url = self.media_url or new_media_path
 
         content = re.sub(
-            r'\b{}\b'.format(old_media_path),
+            r'\b{}\b'.format(original_media_path),
             r'{}'.format(media_url),
             content
         )
 
-        return content.replace(old_media_path, media_url)
+        return content
 
     def _write_file(self, html_document, output_filepath):
         """
