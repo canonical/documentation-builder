@@ -2,6 +2,7 @@
 import re
 import sys
 import tempfile
+from collections import Mapping, OrderedDict
 from copy import deepcopy
 from glob import iglob
 from os import makedirs, path
@@ -80,11 +81,62 @@ def parse_markdown(filepath):
     return (html_content, metadata)
 
 
+def relativize_paths(item, original_base_path, new_base_path):
+    """
+    Recursively search a dictionary for items that look like local markdown
+    locations, and replace them to be relative to local_dirpath instead
+    """
+
+    internal_link_match = r'^[^ "\']+.md(#|\?|$)'
+
+    original_base_path = original_base_path.strip('/')
+    new_base_path = new_base_path.strip('/')
+
+    if isinstance(item, Mapping):
+        for key, child in item.items():
+            item[key] = relativize_paths(
+                child,
+                original_base_path,
+                new_base_path
+            )
+    elif isinstance(item, list):
+        for index, child in enumerate(item):
+            item[index] = relativize_paths(
+                child,
+                original_base_path,
+                new_base_path
+            )
+    elif isinstance(item, str) and re.match(internal_link_match, item):
+        item = relativize(
+            item,
+            original_base_path,
+            new_base_path
+        )
+
+    return item
+
+
+def relativize(location, original_base_path, new_base_path):
+    """
+    Update a relative path considering a new context
+    """
+
+    if location.startswith('/'):
+        abs_location = location.rstrip('/')
+    else:
+        abs_location = '/' + path.join(original_base_path, location).strip('/')
+    abs_dirpath = '/' + new_base_path
+
+    return path.relpath(abs_location, abs_dirpath)
+
+
 class Builder:
     """
     Parse a remote git repository of markdown files into HTML files in the
     specified build folder
     """
+
+    internal_link_match = re.compile(r'\b([^ "\']+)\.md\b')
 
     def __init__(
         self,
@@ -111,8 +163,24 @@ class Builder:
         Entrypoint: Build documentation folder
         """
 
+        self._load_contexts()
         self._copy_media()
         self._build_files()
+
+    def _load_contexts(self):
+        """
+        Find and load context files
+        """
+
+        self.contexts = OrderedDict()
+
+        context_match = '{root}/**/context.yaml'.format(root=self.source_path)
+
+        for context_filepath in iglob(context_match, recursive=True):
+            with open(context_filepath) as context_file:
+                self.contexts[path.dirname(context_filepath)] = yaml.load(
+                    context_file.read()
+                )
 
     def _build_files(self):
         """
@@ -160,9 +228,6 @@ class Builder:
         corresponding Markdown file
         """
 
-        # Get HTML
-        html_document = self._build_html(source_filepath)
-
         # Decide output filepath
         local_path = path.relpath(source_filepath, self.source_path)
 
@@ -172,16 +237,13 @@ class Builder:
             path.join(self.output_path, local_path)
         )
 
-        html_document = self._replace_media_links(
-            html_document,
-            source_filepath,
-            output_filepath
-        )
+        # Get HTML
+        html_document = self._build_html(source_filepath, output_filepath)
 
         # Write output to file
         self._write_file(html_document, output_filepath)
 
-    def _build_html(self, source_filepath):
+    def _build_html(self, source_filepath, output_filepath):
         """
         Parse markdown file with template to output full HTML markup
         """
@@ -190,16 +252,26 @@ class Builder:
         (html_content, metadata) = parse_markdown(source_filepath)
 
         # Build document from template
-        local_context = self._build_context(path.dirname(source_filepath))
+        local_context = self._build_context(source_filepath, output_filepath)
         local_context.update(metadata)
         local_context['content'] = html_content
         html_document = self.template.render(local_context)
 
-        html_document = self._replace_internal_links(html_document)
+        # Fixup internal references
+        html_document = self._replace_media_links(
+            html_document,
+            source_filepath,
+            output_filepath
+        )
+        html_document = self._replace_internal_links(
+            html_document,
+            source_filepath,
+            output_filepath
+        )
 
         return html_document
 
-    def _build_context(self, local_path):
+    def _build_context(self, source_filepath, output_filepath):
         """
         Construct the template context for an individual page,
         by finding and merging all context.yaml files from this folder to the
@@ -207,40 +279,62 @@ class Builder:
         """
 
         local_context = {}
+        source_dirpath = path.dirname(source_filepath)
+        local_filepath = path.relpath(source_filepath, self.source_path)
+        local_dirpath = path.dirname(local_filepath)
 
-        context_match = '{root}/**/context.yaml'.format(root=self.source_path)
-
-        for context_filepath in iglob(context_match, recursive=True):
-            if local_path.startswith(path.dirname(context_filepath)):
-                with open(context_filepath) as context_file:
-                    local_context.update(yaml.load(context_file))
+        for context_dirpath, content in self.contexts.items():
+            if source_dirpath.startswith(context_dirpath):
+                context = deepcopy(content)
+                context = relativize_paths(
+                    context,
+                    context_dirpath,
+                    local_dirpath
+                )
+                local_context.update(context)
 
         return local_context
 
-    def _replace_internal_links(self, html_document):
+    def _replace_internal_links(
+        self,
+        content,
+        source_filepath,
+        output_filepath
+    ):
         """
         Swap out links to local .md files with the correct filenames
         """
 
+        # Calculate relative path
+        relative_media_path = path.relpath(
+            self.output_media_path,
+            path.dirname(output_filepath)
+        )
+        media_url = self.media_url or relative_media_path
+        old_media_path = path.relpath(
+            self.source_media_path,
+            path.dirname(source_filepath)
+        )
+
         # Replace internal document links
         if self.no_link_extensions:
-            html_document = re.sub(
-                r'(href="(?! *http).*)\.md',
+            content = re.sub(
+                self.internal_link_match,
                 r'\1',
-                html_document
+                content
             )
         else:
-            html_document = re.sub(
-                r'(href="(?! *http).*)\.md',
+            content = re.sub(
+                self.internal_link_match,
                 r'\1.html',
-                html_document
+                content
             )
 
-        return html_document
+        return content
 
     def _replace_media_links(
         self,
-        html_document,
+        content,
         source_filepath,
         output_filepath
     ):
@@ -253,13 +347,18 @@ class Builder:
             path.dirname(output_filepath)
         )
         media_url = self.media_url or relative_media_path
-
         old_media_path = path.relpath(
             self.source_media_path,
             path.dirname(source_filepath)
         )
 
-        return html_document.replace(old_media_path, media_url)
+        content = re.sub(
+            r'\b{}\b'.format(old_media_path),
+            r'{}'.format(media_url),
+            content
+        )
+
+        return content.replace(old_media_path, media_url)
 
     def _write_file(self, html_document, output_filepath):
         """
@@ -276,17 +375,17 @@ class Builder:
 
 
 def build(
-    repository,
-    branch,
-    source_path,
-    source_media_dir,
-    output_path,
-    output_media_path,
-    template_path,
-    media_url,
-    no_link_extensions,
-    no_cleanup,
-    ignore_files
+    repository=None,
+    branch=None,
+    source_path='.',
+    source_media_dir='media',
+    output_path='build',
+    output_media_path='build/media',
+    template_path=None,
+    media_url=None,
+    no_link_extensions=False,
+    no_cleanup=False,
+    ignore_files=['README.md']
 ):
     with open(template_path or default_template) as template_file:
         template = Template(template_file.read())
