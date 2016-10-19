@@ -178,7 +178,11 @@ class Builder:
 
         for context_filepath in iglob(context_match, recursive=True):
             with open(context_filepath) as context_file:
-                self.contexts[path.dirname(context_filepath)] = yaml.load(
+                context_localpath = path.relpath(
+                    context_filepath,
+                    self.source_path
+                )
+                self.contexts[path.dirname(context_localpath)] = yaml.load(
                     context_file.read()
                 )
 
