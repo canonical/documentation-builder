@@ -10,29 +10,42 @@ from shutil import rmtree
 
 # Third party modules
 import frontmatter
-import markdown
 import yaml
+from bs4 import BeautifulSoup
 from git import Repo
 from jinja2 import Template
-from yaml.scanner import ScannerError
-from yaml.parser import ParserError
 
 # Local modules
 from .utilities import mergetree
+
+# Markdown and plugins
+import markdown
+from markdown.extensions.attr_list import AttrListExtension
+from markdown.extensions.def_list import DefListExtension
+from markdown.extensions.fenced_code import FencedCodeExtension
+from markdown.extensions.meta import MetaExtension
+from markdown.extensions.tables import TableExtension
+from markdown.extensions.toc import TocExtension
+from mdx_callouts import makeExtension as CalloutsExtension
+from mdx_anchors_away import AnchorsAwayExtension
+from mdx_foldouts import makeExtension as FoldoutsExtension
+from yaml.scanner import ScannerError
+from yaml.parser import ParserError
+
 
 # Configuration
 # ==
 default_title = 'Juju Documentation'
 markdown_extensions = [
-    'markdown.extensions.meta',
-    'markdown.extensions.tables',
-    'markdown.extensions.fenced_code',
-    'markdown.extensions.def_list',
-    'markdown.extensions.attr_list',
-    'markdown.extensions.toc',
-    'callouts',
-    'anchors_away',
-    'foldouts'
+    MetaExtension(),
+    TableExtension(),
+    FencedCodeExtension(),
+    DefListExtension(),
+    AttrListExtension(),
+    TocExtension(marker='', baselevel=1),
+    CalloutsExtension(),
+    AnchorsAwayExtension(),
+    FoldoutsExtension(),
 ]
 default_template = path.join(
     path.dirname(__file__),
@@ -77,6 +90,23 @@ def parse_markdown(filepath):
                 markdown_meta[name] = value[0]
 
         metadata.update(markdown_meta)
+
+    if metadata.get('table_of_contents'):
+        toc_soup = BeautifulSoup(markdown_parser.toc, 'html.parser')
+
+        # Get title list item (<h1>)
+        nav_item_strings = []
+
+        # Only get <h2> items, to avoid getting crazy
+        for item in toc_soup.select('.toc > ul > li > ul > li'):
+            for child in item('ul'):
+                child.extract()
+
+            item['class'] = 'p-toc__item'
+
+            nav_item_strings.append(str(item))
+
+        metadata['toc_items'] = "\n".join(nav_item_strings)
 
     return (html_content, metadata)
 
