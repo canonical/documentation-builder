@@ -38,4 +38,6 @@ setup(
         "python-frontmatter==0.2.1",
         "PyYAML==3.12",
     ],
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest'],
 )
