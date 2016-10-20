@@ -151,7 +151,7 @@ def relativize_paths(item, original_base_path, new_base_path):
 
 def relativize(location, original_base_path, new_base_path):
     """
-    Update a relative path considering a new context
+    Update a relative path for a new base location
     """
 
     if location.startswith('/'):
@@ -196,27 +196,27 @@ class Builder:
         Entrypoint: Build documentation folder
         """
 
-        self._load_contexts()
+        self._load_metadata()
         self._copy_media()
         self._build_files()
 
-    def _load_contexts(self):
+    def _load_metadata(self):
         """
-        Find and load context files
+        Find and load metadata files
         """
 
-        self.contexts = OrderedDict()
+        self.metadata_trees = OrderedDict()
 
-        context_match = '{root}/**/context.yaml'.format(root=self.source_path)
+        files_match = '{root}/**/metadata.yaml'.format(root=self.source_path)
 
-        for context_filepath in iglob(context_match, recursive=True):
-            with open(context_filepath) as context_file:
-                context_localpath = path.relpath(
-                    context_filepath,
+        for filepath in iglob(files_match, recursive=True):
+            with open(filepath) as metadata_file:
+                path_in_project = path.relpath(
+                    filepath,
                     self.source_path
                 )
-                self.contexts[path.dirname(context_localpath)] = yaml.load(
-                    context_file.read()
+                self.metadata_trees[path.dirname(path_in_project)] = yaml.load(
+                    metadata_file.read()
                 )
 
     def _build_files(self):
@@ -274,12 +274,12 @@ class Builder:
             return
 
         # Decide output filepath
-        local_path = path.relpath(source_filepath, self.source_path)
+        path_in_project = path.relpath(source_filepath, self.source_path)
 
         output_filepath = re.sub(
             r'\.md$',
             '.html',
-            path.join(self.output_path, local_path)
+            path.join(self.output_path, path_in_project)
         )
 
         # Skip if it's unmodified
@@ -301,13 +301,13 @@ class Builder:
         """
 
         # Parse the markdown
-        (html_content, metadata) = parse_markdown(source_filepath)
+        (html_content, local_metadata) = parse_markdown(source_filepath)
 
         # Build document from template
-        local_context = self._build_context(source_filepath, output_filepath)
-        local_context.update(metadata)
-        local_context['content'] = html_content
-        html_document = self.template.render(local_context)
+        metadata = self._build_metadata(source_filepath, output_filepath)
+        metadata.update(local_metadata)
+        metadata['content'] = html_content
+        html_document = self.template.render(metadata)
 
         # Fixup internal references
         html_document = self._replace_media_links(
@@ -323,29 +323,29 @@ class Builder:
 
         return html_document
 
-    def _build_context(self, source_filepath, output_filepath):
+    def _build_metadata(self, source_filepath, output_filepath):
         """
-        Construct the template context for an individual page,
-        by finding and merging all context.yaml files from this folder to the
+        Construct the template metadata for an individual page,
+        by finding and merging all metadata.yaml files from this folder to the
         documentation root
         """
 
-        local_context = {}
+        metadata = {}
         source_dirpath = path.dirname(source_filepath)
-        local_filepath = path.relpath(source_filepath, self.source_path)
-        local_dirpath = path.dirname(local_filepath)
+        path_in_project = path.relpath(source_filepath, self.source_path)
+        dir_in_project = path.dirname(path_in_project)
 
-        for context_dirpath, content in self.contexts.items():
-            if source_dirpath.startswith(context_dirpath):
-                context = deepcopy(content)
-                context = relativize_paths(
-                    context,
-                    context_dirpath,
-                    local_dirpath
+        for metadata_tree_path, content in self.metadata_trees.items():
+            if source_dirpath.startswith(metadata_tree_path):
+                metadata_tree = deepcopy(content)
+                metadata_tree = relativize_paths(
+                    metadata_tree,
+                    metadata_tree_path,
+                    dir_in_project
                 )
-                local_context.update(context)
+                metadata.update(metadata_tree)
 
-        return local_context
+        return metadata
 
     def _replace_internal_links(
         self,
