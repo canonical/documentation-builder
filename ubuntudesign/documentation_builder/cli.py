@@ -1,11 +1,12 @@
 # Core modules
 import argparse
 import sys
-from os import getcwd
+from os import getcwd, path
 from glob import glob
+import pkg_resources
 
 # Local modules
-from .build import build
+from .builder import build
 
 
 def parse_arguments():
@@ -35,7 +36,7 @@ def parse_arguments():
     )
     parser.add_argument(
         '--source-path',
-        default=".",
+        default='.',
         help="Path to the folder containing markdown files (default: .)"
     )
     parser.add_argument(
@@ -44,19 +45,13 @@ def parse_arguments():
         help="Path to the folder containing media files (default: ./media)"
     )
     parser.add_argument(
-        '--source-context-file',
-        default="context.yaml",
-        help="A file containing the context object for building the templates"
-    )
-    parser.add_argument(
         '--output-path',
-        default=".",
+        default="build",
         help="Destination path for the built HTML files (default: .)"
     )
     parser.add_argument(
-        '--output-media-dir',
-        default="media",
-        help="Where to put media files (default: ./media)"
+        '--output-media-path',
+        help="Where to put media files (default: ./build/media)"
     )
     parser.add_argument(
         '--template-path',
@@ -74,8 +69,45 @@ def parse_arguments():
         action='store_true',
         help="Don't include '.html' extension in internal links"
     )
+    parser.add_argument(
+        '--no-cleanup',
+        action='store_true',
+        help="Don't clean up temporary directory after cloning repository"
+    )
+    parser.add_argument(
+        '--ignore-file',
+        action='append',
+        default=['README.md'],
+        dest='ignore_files',
+        help=(
+            "Filename of a markdown file to ignore and not parse into HTML. "
+            "Can be declared multiple times."
+        )
+    )
+    parser.add_argument(
+        '--version',
+        action='store_true',
+        help="Show the currently installed version"
+    )
 
-    return parser.parse_args()
+    arguments = vars(parser.parse_args())
+
+    if arguments['version']:
+        print(
+            pkg_resources.get_distribution(
+                "ubuntudesign.documentation_builder"
+            ).version
+        )
+        sys.exit()
+    else:
+        del arguments['version']
+
+    if not arguments['output_media_path']:
+        arguments['output_media_path'] = path.join(
+            arguments['output_path'], 'media'
+        )
+
+    return arguments
 
 
 def preprocess_files(dir_path, preprocessor_string):
@@ -99,7 +131,7 @@ def main():
     """
 
     arguments = parse_arguments()
-    build(**vars(arguments))
+    build(**arguments)
 
 
 if __name__ == "__main__":
