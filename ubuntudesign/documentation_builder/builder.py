@@ -355,12 +355,11 @@ class Builder:
             path.dirname(output_filepath)
         )
         media_url = self.media_url or new_media_path
-
-        content = re.sub(
-            r'\b{}(?=/)'.format(original_media_path.replace('.', '\.')),
-            r'{}'.format(media_url),
-            content
+        media_search = r'(?<=[\'"]){}(?=/)'.format(
+            original_media_path.replace('.', '\.')
         )
+
+        content = re.sub(media_search, media_url, content)
 
         return content
 
