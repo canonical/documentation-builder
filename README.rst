@@ -27,7 +27,7 @@ Optional arguments:
     $ documentation-builder \
         --base-directory {dirpath}        `# Path to the base folder for the documentation repository`
         --source-folder {dirpath}         `# Path to the folder containing markdown files inside the base directory (default: .)`
-        --media-folder {dirpath}          `# Path to the folder containing media files inside the base directory (default: ./media)`
+        --media-path {dirpath}            `# Path to the folder containing media files (default: ./media)`
         --site-root {local-url-path}      `# A URL path to the root of the site, for use in the 'home' link in the template`
         --output-path {dirpath}           `# Destination path for the built HTML files (default: ./build)`
         --output-media-path {dirpath}     `# Where to put media files (default: ./build/media)`

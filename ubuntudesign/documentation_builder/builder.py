@@ -456,7 +456,7 @@ class Builder:
 def build(
     base_directory='.',
     source_folder='.',
-    media_folder='media',
+    media_path='media',
     output_path='build',
     output_media_path='build/media',
     template_path=None,
@@ -470,7 +470,6 @@ def build(
         template = Template(template_file.read())
 
     source_path = path.normpath(path.join(base_directory, source_folder))
-    media_path = path.normpath(path.join(source_path, media_folder))
 
     builder = Builder(
         source_path=source_path,
