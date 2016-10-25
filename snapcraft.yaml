@@ -10,7 +10,7 @@ confinement: strict
 parts:
   repo:
     plugin: python
-    source: https://github.com/CanonicalLtd/documentation-builder.git
+    source: .
   copy:
     plugin: dump
     source: bin
