@@ -30,15 +30,28 @@
       margin-right: 5px;
       margin-bottom: 4px;
     }
+    .p-toc__item {
+      margin-bottom: 0.5em;
+    }
+    @media (min-width: 768px) {
+      .p-toc {
+        width: 224px;
+      }
+      .p-toc.fixed {
+        position: fixed;
+        top: 28px;
+        right: 16px;
+      }
+    }
     </style>
   </head>
   <body class="theme">
     <header class="p-navigation" role="banner">
       <div class="p-navigation__logo">
-        <a class="p-navigation__link" href="/">
+        {% if site_base_path %}<a class="p-navigation__link" href="/">{% endif %}
           {% if site_logo_url %}<img class="site-logo" src="{{ site_logo_url }}" alt="{{ site_title }} logo" />{% endif %}
           {{ site_title if site_title else 'Documentation' }}
-        </a>
+        {% if site_base_path %}</a>{% endif %}
       </div>
       <nav class="p-navigation__nav">
         <span class="u-off-screen">
@@ -200,6 +213,19 @@
             {{ content }}
           </main>
         </div>
+        {% if toc_items %}
+        <aside class="col-2 theme__aside">
+          <div class="p-toc">
+            <h4 class="p-toc__header">Contents</h4>
+            <nav>
+              <ul class="p-toc__list">
+                <li class="p-toc__item"><a href="#">Top</a></li>
+               {{ toc_items }}
+              </ul>
+            </nav>
+          </div>
+        </aside>
+        {% endif %}
       </div>
     </div>
     <footer class="p-footer" role="contentinfo">
@@ -217,6 +243,20 @@
           link.className += ' p-link--external';
         }
       });
+
+      /* Setup sticky table of contents */
+      var toc = document.querySelector('.p-toc');
+      if (toc) {
+        window.addEventListener(
+          'scroll',
+          function(scrollEvent) {
+            toc.classList.toggle(
+              'fixed',
+              window.innerWidth >= 768 && window.scrollY > 50
+            );
+          }
+        );
+      }
     </script>
   </body>
 </html>

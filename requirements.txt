@@ -4,3 +4,5 @@ mdx-anchors-away==1.0.1
 mdx-callouts==1.0.0
 mdx-foldouts==1.0.0
 jinja2==2.8
+bs4==0.0.1
+
