@@ -47,6 +47,9 @@ markdown_extensions = [
     AnchorsAwayExtension(),
     FoldoutsExtension(),
 ]
+
+markdown_parser = markdown.Markdown(extensions=markdown_extensions)
+
 default_template = path.join(
     path.dirname(__file__),
     'resources',
@@ -60,7 +63,7 @@ def parse_markdown(filepath):
     the meta title
     """
 
-    markdown_parser = markdown.Markdown(extensions=markdown_extensions)
+    markdown_parser.reset()
 
     metadata = {}
 
