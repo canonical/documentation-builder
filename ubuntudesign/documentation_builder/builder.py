@@ -454,10 +454,9 @@ class Builder:
 
 
 def build(
-    repository=None,
-    branch=None,
-    source_path='.',
-    source_media_dir='media',
+    base_directory='.',
+    source_folder='.',
+    media_folder='media',
     output_path='build',
     output_media_path='build/media',
     template_path=None,
@@ -470,31 +469,18 @@ def build(
     with open(template_path or default_template) as template_file:
         template = Template(template_file.read())
 
-    if repository:
-        repo_dir = tempfile.mkdtemp()
-        self._print("Cloning {repository} into {repo_dir}".format(**locals()))
-        if branch:
-            Repo.clone_from(repository, repo_dir, branch=branch)
-        else:
-            Repo.clone_from(repository, repo_dir)
+    source_path = path.normpath(path.join(base_directory, source_folder))
+    media_path = path.normpath(path.join(source_path, media_folder))
 
-        source_path = path.join(repo_dir, source_path)
-
-    try:
-        builder = Builder(
-            source_path=source_path,
-            source_media_path=path.join(source_path, source_media_dir),
-            output_path=output_path,
-            output_media_path=output_media_path,
-            template=template,
-            site_root=site_root,
-            media_url=media_url,
-            no_link_extensions=no_link_extensions,
-            quiet=quiet
-        )
-        builder.build()
-
-    finally:
-        if repository and not no_cleanup:
-            self._print("Cleaning up {repo_dir}".format(**locals()))
-            rmtree(repo_dir)
+    builder = Builder(
+        source_path=source_path,
+        source_media_path=media_path,
+        output_path=output_path,
+        output_media_path=output_media_path,
+        template=template,
+        site_root=site_root,
+        media_url=media_url,
+        no_link_extensions=no_link_extensions,
+        quiet=quiet
+    )
+    builder.build()

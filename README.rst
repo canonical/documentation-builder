@@ -14,25 +14,21 @@ Installation
 Usage
 -----
 
-The basic usage will build the markdown files from a remote repository
-in the standard format into the local directory:
+To build a local folder of markdown files in the appropriate format into HTML files:
 
 .. code:: bash
 
     $ documentation-builder  # Build markdown documentation from the current directory
-    # or
-    $ documentation-builder --repository git@github.com:juju/docs.git  # Build documentation from remote repository
 
 Optional arguments:
 
 .. code:: bash
 
     $ documentation-builder \
-        --repository {repository-url}     `# A source repository. If provided, all source paths will be relative to this repository root`
-        --branch {branch-name}            `# Pull from an alternative branch to the default (only valid with --repository)`
-        --source-path {dirpath}           `# Path to the folder containing markdown files (default: .)`
-        --source-media-dir {dirpath}      `# Path to the folder containing media files (default: ./media)`
-        --source-context-file {filepath}  `# A file containing the context object for building the templates (default: ./context.yaml)`
+        --base-directory {dirpath}        `# Path to the base folder for the documentation repository`
+        --source-folder {dirpath}         `# Path to the folder containing markdown files inside the base directory (default: .)`
+        --media-folder {dirpath}          `# Path to the folder containing media files inside the base directory (default: ./media)`
+        --site-root {local-url-path}      `# A URL path to the root of the site, for use in the 'home' link in the template`
         --output-path {dirpath}           `# Destination path for the built HTML files (default: ./build)`
         --output-media-path {dirpath}     `# Where to put media files (default: ./build/media)`
         --template-path {filepath}        `# Path to an alternate wrapping template for the built HTML files`
