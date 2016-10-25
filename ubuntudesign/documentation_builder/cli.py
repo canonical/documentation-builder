@@ -35,11 +35,11 @@ def parse_arguments():
         )
     )
     parser.add_argument(
-        '--media-folder',
+        '--media-path',
         default="media",
         help=(
-            "Path to the folder containing media files "
-            "inside the base directory (default: ./media)"
+            "Path to the folder containing media files relative to the current"
+            "directory (default: ./media)"
         )
     )
     parser.add_argument(
