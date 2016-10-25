@@ -24,11 +24,18 @@
     .js-collapsed .js-toggle-collapsed:before {
       content: '+';
     }
+    .p-navigation__logo {
+      font-weight: 400;
+      color: #000;
+    }
+    .p-navigation__link:hover {
+       text-decoration: none;
+    }
     .site-logo {
       vertical-align: middle;
       height: 28px;
-      margin-right: 5px;
-      margin-bottom: 4px;
+      margin-right: 0.5rem;
+      margin-bottom: 1px;
     }
     .p-toc__item {
       margin-bottom: 0.5em;
@@ -48,10 +55,10 @@
   <body class="theme">
     <header class="p-navigation" role="banner">
       <div class="p-navigation__logo">
-        {% if site_base_path %}<a class="p-navigation__link" href="/">{% endif %}
+        {% if site_root %}<a class="p-navigation__link" href="{{ site_root }}">{% endif %}
           {% if site_logo_url %}<img class="site-logo" src="{{ site_logo_url }}" alt="{{ site_title }} logo" />{% endif %}
           {{ site_title if site_title else 'Documentation' }}
-        {% if site_base_path %}</a>{% endif %}
+        {% if site_root %}</a>{% endif %}
       </div>
       <nav class="p-navigation__nav">
         <span class="u-off-screen">

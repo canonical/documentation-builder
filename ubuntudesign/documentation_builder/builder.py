@@ -178,6 +178,7 @@ class Builder:
         output_path,
         output_media_path,
         template,
+        site_root,
         media_url,
         no_link_extensions,
         quiet
@@ -187,6 +188,7 @@ class Builder:
         self.output_path = output_path
         self.output_media_path = output_media_path
         self.template = template
+        self.site_root = site_root
         self.media_url = media_url
         self.no_link_extensions = no_link_extensions
         self.quiet = quiet
@@ -307,6 +309,10 @@ class Builder:
         metadata = self._build_metadata(source_filepath, output_filepath)
         metadata.update(local_metadata)
         metadata['content'] = html_content
+
+        if self.site_root:
+            metadata['site_root'] = self.site_root
+
         html_document = self.template.render(metadata)
 
         # Fixup internal references
@@ -441,6 +447,7 @@ def build(
     output_path='build',
     output_media_path='build/media',
     template_path=None,
+    site_root=None,
     media_url=None,
     no_link_extensions=False,
     no_cleanup=False,
@@ -466,6 +473,7 @@ def build(
             output_path=output_path,
             output_media_path=output_media_path,
             template=template,
+            site_root=site_root,
             media_url=media_url,
             no_link_extensions=no_link_extensions,
             quiet=quiet

@@ -58,6 +58,13 @@ def parse_arguments():
         help="Path to an alternate wrapping template for the built HTML files"
     )
     parser.add_argument(
+        '--site-root',
+        help=(
+            "A URL path to the root of the site, for use in the 'home' "
+            "link in the template."
+        )
+    )
+    parser.add_argument(
         '--media-url',
         help=(
             "Prefix for linking to media inside the built HTML files "
