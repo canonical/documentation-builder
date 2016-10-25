@@ -4,7 +4,7 @@ import sys
 import tempfile
 from collections import Mapping, OrderedDict
 from copy import deepcopy
-from glob import iglob
+from glob import glob, iglob
 from os import makedirs, path
 from shutil import rmtree
 
@@ -198,28 +198,42 @@ class Builder:
         Entrypoint: Build documentation folder
         """
 
-        self._load_metadata()
+        self.metadata_trees = self._get_metadata()
         self._copy_media()
         self._build_files()
 
-    def _load_metadata(self):
+    def _get_metadata(self):
         """
         Find and load metadata files
         """
 
-        self.metadata_trees = OrderedDict()
+        metadata_trees = OrderedDict()
 
         files_match = '{root}/**/metadata.yaml'.format(root=self.source_path)
+        files = glob(files_match, recursive=True)
 
-        for filepath in iglob(files_match, recursive=True):
+        if not files:
+            self._print(
+                "\nNo metadata.yaml found, is this a repository "
+                "of documentation?\n"
+                "\n"
+                "See https://github.com/canonicalltd/documentation-builder "
+                "for instructions.\n",
+                channel=sys.stderr
+            )
+            sys.exit(1)
+
+        for filepath in files:
             with open(filepath) as metadata_file:
                 path_in_project = path.relpath(
                     filepath,
                     self.source_path
                 )
-                self.metadata_trees[path.dirname(path_in_project)] = yaml.load(
+                metadata_trees[path.dirname(path_in_project)] = yaml.load(
                     metadata_file.read()
                 )
+
+        return metadata_trees
 
     def _build_files(self):
         """
