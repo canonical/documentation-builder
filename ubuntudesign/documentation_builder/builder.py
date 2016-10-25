@@ -229,10 +229,7 @@ class Builder:
             path.join(self.source_path, '**/*.md'),
             recursive=True
         ):
-            if path.basename(filepath) in self.ignore_files:
-                print("Ignored {}".format(filepath))
-            else:
-                self._build_file(filepath)
+            self._build_file(filepath)
 
     def _copy_media(self):
         """
@@ -264,6 +261,16 @@ class Builder:
         Create an HTML file for a documentation page from a path to the
         corresponding Markdown file
         """
+
+        # Ignore all uppercase filenames
+        name = path.splitext(path.basename(source_filepath))[0]
+        alphabet_name = re.sub(r'\W+', '', name)
+
+        if alphabet_name.isupper():
+            self._print("Skipping all-uppercase file: {}".format(
+                source_filepath
+            ))
+            return
 
         # Decide output filepath
         local_path = path.relpath(source_filepath, self.source_path)
