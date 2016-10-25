@@ -5,3 +5,7 @@ dist/
 .cache/
 .eggs/
 pytestdebug.log
+*.snap
+parts/
+prime/
+stage/

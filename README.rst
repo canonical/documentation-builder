@@ -9,7 +9,7 @@ Installation
 
 .. code:: bash
 
-    pip3 install ubuntudesign.documentation-builder
+    snap install documentation-builder
 
 Usage
 -----
@@ -40,3 +40,4 @@ Optional arguments:
         --no-link-extensions              `# Don't include '.html' extension in internal links`
         --no-cleanup                      `# Don't clean up temporary directory after cloning repository`
         --ignore-file                     `# Filename of a markdown files to ignore and not parse into HTML. Can be declared multiple times. (default: README.md)`
+
