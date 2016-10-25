@@ -75,14 +75,9 @@ def parse_arguments():
         help="Don't clean up temporary directory after cloning repository"
     )
     parser.add_argument(
-        '--ignore-file',
-        action='append',
-        default=['README.md'],
-        dest='ignore_files',
-        help=(
-            "Filename of a markdown file to ignore and not parse into HTML. "
-            "Can be declared multiple times."
-        )
+        '--quiet',
+        action='store_true',
+        help="Suppress output"
     )
     parser.add_argument(
         '--version',
