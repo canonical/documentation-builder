@@ -281,6 +281,13 @@ class Builder:
             path.join(self.output_path, local_path)
         )
 
+        # Skip if it's unmodified
+        if path.exists(output_filepath) and (
+            path.getmtime(output_filepath) > path.getmtime(source_filepath)
+        ):
+            self._print("Skipping unmodified file: {}".format(source_filepath))
+            return
+
         # Get HTML
         html_document = self._build_html(source_filepath, output_filepath)
 
