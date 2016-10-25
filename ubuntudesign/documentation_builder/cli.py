@@ -22,27 +22,25 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        '--repository',
-        help=(
-            "Build files from a remote repository instead of a local folder"
-        )
+        '--base-directory',
+        default=".",
+        help="The path to the base directory to build from."
     )
     parser.add_argument(
-        '--branch',
-        help=(
-            "Pull from an alternative branch to the default"
-            "Only valid with --repository."
-        )
-    )
-    parser.add_argument(
-        '--source-path',
+        '--source-folder',
         default='.',
-        help="Path to the folder containing markdown files (default: .)"
+        help=(
+            "Path to the folder containing the markdown source files "
+            "inside the base directory (default: .)"
+        )
     )
     parser.add_argument(
-        '--source-media-dir',
+        '--media-folder',
         default="media",
-        help="Path to the folder containing media files (default: ./media)"
+        help=(
+            "Path to the folder containing media files "
+            "inside the base directory (default: ./media)"
+        )
     )
     parser.add_argument(
         '--output-path',
