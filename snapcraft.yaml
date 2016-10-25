@@ -19,4 +19,4 @@ apps:
   documentation-builder:
     plugs:
         - home
-    command: wrapper.sh
+    command: documentation-builder
