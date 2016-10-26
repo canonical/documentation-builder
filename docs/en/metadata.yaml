@@ -1,0 +1,7 @@
+navigation:
+    - title: Basic usage
+      location: index.md
+
+    - title: How to structure documentation
+      location: structure.md
+
