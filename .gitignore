@@ -9,3 +9,4 @@ pytestdebug.log
 parts/
 prime/
 stage/
+build/
