@@ -1,18 +1,18 @@
-Ubuntu documentation builder
-============================
+Getting started with documentation-builder
+===
 
-A tool for building a set of documentation files in HTML format, from a
-remote git repository containing markdown files.
+documentation-builder is a tool for building a set of HTML documentation
+from a remote git repository containing markdown files.
 
 Installation
-------------
+---
 
 ``` bash
 snap install documentation-builder
 ```
 
 Usage
------
+---
 
 To build a local folder of markdown files in the appropriate format into
 HTML files:
