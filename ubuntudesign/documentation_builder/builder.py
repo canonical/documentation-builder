@@ -225,7 +225,7 @@ class Builder:
         Entrypoint: Build documentation folder
         """
 
-        self.metadata_trees = self._get_metadata()
+        self.metadata_items = self._get_metadata()
         self._build_files()
 
     def _get_metadata(self):
@@ -233,7 +233,7 @@ class Builder:
         Find and load metadata files
         """
 
-        metadata_trees = OrderedDict()
+        metadata_items = []
 
         files_match = path.normpath(
             '{root}/**/metadata.yaml'.format(root=self.source_path)
@@ -245,11 +245,13 @@ class Builder:
 
         for filepath in files:
             with open(filepath) as metadata_file:
-                metadata_trees[path.dirname(filepath)] = yaml.load(
-                    metadata_file.read()
-                )
+                metadata_items.append({
+                    'path': path.dirname(filepath),
+                    'modified': path.getmtime(filepath),
+                    'content': yaml.load(metadata_file.read())
+                })
 
-        return metadata_trees
+        return metadata_items
 
     def _build_files(self):
         """
@@ -288,20 +290,31 @@ class Builder:
             path.join(self.output_path, path_in_project)
         )
 
+        # Collect metadata for this file
+        (metadata, metadata_modified) = self._build_metadata(
+            source_filepath,
+            output_filepath
+        )
+
         # Skip if it's unmodified
+        modified = max(metadata_modified, path.getmtime(source_filepath))
         if path.exists(output_filepath) and (
-            path.getmtime(output_filepath) > path.getmtime(source_filepath)
+            path.getmtime(output_filepath) > modified
         ):
             self._print("Skipping unmodified file: {}".format(source_filepath))
             return
 
         # Get HTML
-        html_document = self._build_html(source_filepath, output_filepath)
+        html_document = self._build_html(
+            source_filepath,
+            output_filepath,
+            metadata
+        )
 
         # Write output to file
         self._write_file(html_document, output_filepath)
 
-    def _build_html(self, source_filepath, output_filepath):
+    def _build_html(self, source_filepath, output_filepath, metadata):
         """
         Parse markdown file with template to output full HTML markup
         """
@@ -310,7 +323,6 @@ class Builder:
         (html_content, local_metadata) = parse_markdown(source_filepath)
 
         # Build document from template
-        metadata = self._build_metadata(source_filepath, output_filepath)
         metadata.update(local_metadata)
         metadata['content'] = html_content
 
@@ -341,21 +353,23 @@ class Builder:
         """
 
         metadata = {}
+        modified = 0
         source_dirpath = path.dirname(source_filepath)
         path_in_project = path.relpath(source_filepath, self.source_path)
         dir_in_project = path.dirname(path_in_project)
 
-        for metadata_tree_path, content in self.metadata_trees.items():
-            if source_dirpath.startswith(metadata_tree_path):
-                metadata_tree = deepcopy(content)
+        for item in self.metadata_items:
+            if source_dirpath.startswith(item['path']):
+                modified = max(modified, item['modified'])
+                metadata_tree = deepcopy(item['content'])
                 metadata_tree = relativize_paths(
                     metadata_tree,
-                    metadata_tree_path,
+                    item['path'],
                     dir_in_project
                 )
                 metadata.update(metadata_tree)
 
-        return metadata
+        return (metadata, modified)
 
     def _replace_internal_links(
         self,
