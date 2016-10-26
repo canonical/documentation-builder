@@ -245,8 +245,14 @@ class Builder:
 
         for filepath in files:
             with open(filepath) as metadata_file:
+                local_dir = path.normpath(
+                    path.relpath(
+                        path.dirname(filepath),
+                        self.source_path
+                    )
+                )
                 metadata_items.append({
-                    'path': path.dirname(filepath),
+                    'path': local_dir,
                     'modified': path.getmtime(filepath),
                     'content': yaml.load(metadata_file.read())
                 })
@@ -332,11 +338,13 @@ class Builder:
         html_document = self.template.render(metadata)
 
         # Fixup internal references
-        html_document = self._replace_media_links(
-            html_document,
-            source_filepath,
-            output_filepath
-        )
+        if path.isdir(self.source_media_path):
+            html_document = self._replace_media_links(
+                html_document,
+                source_filepath,
+                output_filepath
+            )
+
         html_document = self._replace_internal_links(
             html_document,
             source_filepath,
@@ -354,18 +362,18 @@ class Builder:
 
         metadata = {}
         modified = 0
-        source_dirpath = path.dirname(source_filepath)
-        path_in_project = path.relpath(source_filepath, self.source_path)
-        dir_in_project = path.dirname(path_in_project)
+        local_filepath = path.relpath(source_filepath, self.source_path)
+        local_dirpath = path.dirname(local_filepath)
 
         for item in self.metadata_items:
-            if source_dirpath.startswith(item['path']):
+            if local_dirpath.startswith(item['path']):
                 modified = max(modified, item['modified'])
                 metadata_tree = deepcopy(item['content'])
+
                 metadata_tree = relativize_paths(
-                    metadata_tree,
-                    item['path'],
-                    dir_in_project
+                    item=metadata_tree,
+                    original_base_path=item['path'],
+                    new_base_path=local_dirpath
                 )
                 metadata.update(metadata_tree)
 
