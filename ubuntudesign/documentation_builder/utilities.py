@@ -1,18 +1,49 @@
+# Core modules
+import re
 from os import listdir, makedirs, path, stat
-from shutil import copytree, copy2
+from shutil import copy2
 
 
 def mergetree(src, dst, symlinks=False, ignore=None):
-    if not path.exists(dst):
-        makedirs(dst)
+    """
+    Deep-merge two directory trees, overwriting changed files
+    """
+
+    makedirs(dst, exist_ok=True)
     for item in listdir(src):
         source = path.join(src, item)
         destination = path.join(dst, item)
         if path.isdir(source):
-            copytree(source, destination, symlinks, ignore)
+            mergetree(source, destination, symlinks, ignore)
         else:
             if (
                 not path.exists(destination) or
                 stat(source).st_mtime - stat(destination).st_mtime > 1
             ):
                 copy2(source, destination)
+
+
+def relativize(location, original_base_path, new_base_path):
+    """
+    Update a relative path for a new base location
+    """
+
+    if location.startswith('/'):
+        abs_location = location.rstrip('/')
+    else:
+        abs_location = '/' + path.join(original_base_path, location).strip('/')
+    abs_dirpath = '/' + new_base_path
+
+    return path.relpath(abs_location, abs_dirpath)
+
+
+def replace_links(html, old_link_path, new_link_path):
+    """
+    In some HTML text, replace old link paths with a new path
+    """
+
+    link_search = r'(?<=[\'"]){}(?=/)'.format(
+        old_link_path.replace('.', '\.')
+    )
+
+    return re.sub(link_search, new_link_path, html)
