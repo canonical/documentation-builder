@@ -180,7 +180,7 @@ class Builder:
         template,
         media_url,
         no_link_extensions,
-        ignore_files
+        quiet
     ):
         self.source_path = source_path
         self.source_media_path = source_media_path
@@ -189,7 +189,7 @@ class Builder:
         self.template = template
         self.media_url = media_url
         self.no_link_extensions = no_link_extensions
-        self.ignore_files = ignore_files
+        self.quiet = quiet
 
     def build(self):
         """
@@ -229,10 +229,7 @@ class Builder:
             path.join(self.source_path, '**/*.md'),
             recursive=True
         ):
-            if path.basename(filepath) in self.ignore_files:
-                print("Ignored {}".format(filepath))
-            else:
-                self._build_file(filepath)
+            self._build_file(filepath)
 
     def _copy_media(self):
         """
@@ -246,17 +243,18 @@ class Builder:
 
             if not media_paths_match:
                 mergetree(self.source_media_path, self.output_media_path)
-                print(
+                self._print(
                     "Copied {} to {}".format(
-                        self.source_media_path, self.output_media_path
+                        self.source_media_path,
+                        self.output_media_path
                     )
                 )
         else:
-            print(
+            self._print(
                 "Warning: Media directory not found at {}.".format(
                     self.source_media_path
                 ),
-                file=sys.stderr
+                channel=sys.stderr
             )
 
     def _build_file(self, source_filepath):
@@ -264,6 +262,16 @@ class Builder:
         Create an HTML file for a documentation page from a path to the
         corresponding Markdown file
         """
+
+        # Ignore all uppercase filenames
+        name = path.splitext(path.basename(source_filepath))[0]
+        alphabet_name = re.sub(r'\W+', '', name)
+
+        if alphabet_name.isupper():
+            self._print("Skipping uppercase filename: {}".format(
+                source_filepath
+            ))
+            return
 
         # Decide output filepath
         local_path = path.relpath(source_filepath, self.source_path)
@@ -273,6 +281,13 @@ class Builder:
             '.html',
             path.join(self.output_path, local_path)
         )
+
+        # Skip if it's unmodified
+        if path.exists(output_filepath) and (
+            path.getmtime(output_filepath) > path.getmtime(source_filepath)
+        ):
+            self._print("Skipping unmodified file: {}".format(source_filepath))
+            return
 
         # Get HTML
         html_document = self._build_html(source_filepath, output_filepath)
@@ -407,7 +422,15 @@ class Builder:
         with open(output_filepath, 'w') as output_file:
             output_file.write(html_document)
 
-        print("Created {output_filepath}".format(**locals()))
+        self._print("Created {output_filepath}".format(**locals()))
+
+    def _print(self, message, channel=sys.stdout):
+        """
+        Output a message unless quiet is on
+        """
+
+        if not self.quiet:
+            print(message, file=channel)
 
 
 def build(
@@ -421,14 +444,14 @@ def build(
     media_url=None,
     no_link_extensions=False,
     no_cleanup=False,
-    ignore_files=['README.md']
+    quiet=False
 ):
     with open(template_path or default_template) as template_file:
         template = Template(template_file.read())
 
     if repository:
         repo_dir = tempfile.mkdtemp()
-        print("Cloning {repository} into {repo_dir}".format(**locals()))
+        self._print("Cloning {repository} into {repo_dir}".format(**locals()))
         if branch:
             Repo.clone_from(repository, repo_dir, branch=branch)
         else:
@@ -445,11 +468,11 @@ def build(
             template=template,
             media_url=media_url,
             no_link_extensions=no_link_extensions,
-            ignore_files=ignore_files
+            quiet=quiet
         )
         builder.build()
 
     finally:
         if repository and not no_cleanup:
-            print("Cleaning up {repo_dir}".format(**locals()))
+            self._print("Cleaning up {repo_dir}".format(**locals()))
             rmtree(repo_dir)
