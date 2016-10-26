@@ -163,6 +163,33 @@ def relativize(location, original_base_path, new_base_path):
     return path.relpath(abs_location, abs_dirpath)
 
 
+def copy_media(source_path, output_path, quiet=False):
+    """
+    Copy media files from source_media_path to output_media_path
+    """
+
+    if not path.isdir(source_path):
+        if not quiet:
+            print(
+                "Warning: Media directory not found at {}.".format(
+                    source_path
+                ),
+                file=sys.stderr
+            )
+            return
+
+    media_paths_match = path.relpath(
+        source_path, output_path
+    ) == '.'
+
+    if not media_paths_match:
+        mergetree(source_path, output_path)
+        if not quiet:
+            print(
+                "Copied {} to {}".format(source_path, output_path)
+            )
+
+
 class Builder:
     """
     Parse a remote git repository of markdown files into HTML files in the
@@ -183,10 +210,10 @@ class Builder:
         no_link_extensions,
         quiet
     ):
-        self.source_path = source_path
-        self.source_media_path = source_media_path
-        self.output_path = output_path
-        self.output_media_path = output_media_path
+        self.source_path = path.normpath(source_path)
+        self.source_media_path = path.normpath(source_media_path)
+        self.output_path = path.normpath(output_path)
+        self.output_media_path = path.normpath(output_media_path)
         self.template = template
         self.site_root = site_root
         self.media_url = media_url
@@ -199,7 +226,6 @@ class Builder:
         """
 
         self.metadata_trees = self._get_metadata()
-        self._copy_media()
         self._build_files()
 
     def _get_metadata(self):
@@ -209,27 +235,17 @@ class Builder:
 
         metadata_trees = OrderedDict()
 
-        files_match = '{root}/**/metadata.yaml'.format(root=self.source_path)
+        files_match = path.normpath(
+            '{root}/**/metadata.yaml'.format(root=self.source_path)
+        )
         files = glob(files_match, recursive=True)
 
         if not files:
-            self._print(
-                "\nNo metadata.yaml found, is this a repository "
-                "of documentation?\n"
-                "\n"
-                "See https://github.com/canonicalltd/documentation-builder "
-                "for instructions.\n",
-                channel=sys.stderr
-            )
-            sys.exit(1)
+            raise EnvironmentError('No metadata.yaml found')
 
         for filepath in files:
             with open(filepath) as metadata_file:
-                path_in_project = path.relpath(
-                    filepath,
-                    self.source_path
-                )
-                metadata_trees[path.dirname(path_in_project)] = yaml.load(
+                metadata_trees[path.dirname(filepath)] = yaml.load(
                     metadata_file.read()
                 )
 
@@ -242,36 +258,10 @@ class Builder:
         """
 
         for filepath in iglob(
-            path.join(self.source_path, '**/*.md'),
+            path.normpath(path.join(self.source_path, '**/*.md')),
             recursive=True
         ):
             self._build_file(filepath)
-
-    def _copy_media(self):
-        """
-        Copy media files from source_media_path to output_media_path
-        """
-
-        if path.isdir(self.source_media_path):
-            media_paths_match = path.relpath(
-                self.source_media_path, self.output_media_path
-            ) == '.'
-
-            if not media_paths_match:
-                mergetree(self.source_media_path, self.output_media_path)
-                self._print(
-                    "Copied {} to {}".format(
-                        self.source_media_path,
-                        self.output_media_path
-                    )
-                )
-        else:
-            self._print(
-                "Warning: Media directory not found at {}.".format(
-                    self.source_media_path
-                ),
-                channel=sys.stderr
-            )
 
     def _build_file(self, source_filepath):
         """
@@ -459,6 +449,7 @@ def build(
     media_path='media',
     output_path='build',
     output_media_path='build/media',
+    build_version_branches=False,
     template_path=None,
     site_root=None,
     media_url=None,
@@ -471,15 +462,77 @@ def build(
 
     source_path = path.normpath(path.join(base_directory, source_folder))
 
-    builder = Builder(
-        source_path=source_path,
-        source_media_path=media_path,
-        output_path=output_path,
-        output_media_path=output_media_path,
-        template=template,
-        site_root=site_root,
-        media_url=media_url,
-        no_link_extensions=no_link_extensions,
-        quiet=quiet
-    )
-    builder.build()
+    copy_media(media_path, output_media_path, quiet)
+
+    if build_version_branches:
+        versions_filepath = path.join(source_path, 'versions')
+
+        if not path.exists(versions_filepath):
+            print('Versions file not found at {}'.format(versions_filepath))
+            sys.exit(1)
+
+        with open(versions_filepath) as versions_file:
+            lines = versions_file.read().splitlines()
+            version_branches = list(filter(None, lines))
+
+        for branch in version_branches:
+            branch_dir = tempfile.mkdtemp()
+            branch_source_path = path.join(branch_dir, source_folder)
+            branch_output_path = path.join(output_path, branch)
+
+            if not quiet:
+                print('Cloning branch {} into {}'.format(branch, branch_dir))
+
+            Repo.clone_from(base_directory, branch_dir, branch=branch)
+
+            if not quiet:
+                print(
+                    'Building branch {} into {}'.format(
+                        branch,
+                        branch_output_path
+                    )
+                )
+
+            try:
+                builder = Builder(
+                    source_path=branch_source_path,
+                    source_media_path=media_path,
+                    output_path=branch_output_path,
+                    output_media_path=output_media_path,
+                    template=template,
+                    site_root=site_root,
+                    media_url=media_url,
+                    no_link_extensions=no_link_extensions,
+                    quiet=quiet
+                )
+                builder.build()
+            finally:
+                if not no_cleanup:
+                    print("Cleaning up {}".format(branch_dir))
+                    rmtree(branch_dir)
+
+    else:
+        try:
+            builder = Builder(
+                source_path=source_path,
+                source_media_path=media_path,
+                output_path=output_path,
+                output_media_path=output_media_path,
+                template=template,
+                site_root=site_root,
+                media_url=media_url,
+                no_link_extensions=no_link_extensions,
+                quiet=quiet
+            )
+            builder.build()
+        except:
+            if not quiet:
+                print(
+                    "\nNo metadata.yaml found, is this a repository "
+                    "of documentation?\n"
+                    "\n"
+                    "See https://github.com/canonicalltd/documentation-builder"
+                    " for instructions.\n",
+                    file=sys.stderr
+                )
+            sys.exit(1)

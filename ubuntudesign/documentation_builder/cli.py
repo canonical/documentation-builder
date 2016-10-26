@@ -70,6 +70,14 @@ def parse_arguments():
         )
     )
     parser.add_argument(
+        '--build-version-branches',
+        action='store_true',
+        help=(
+            "Build each branch mentioned in the `versions` file into a "
+            "subfolder"
+        )
+    )
+    parser.add_argument(
         '--no-link-extensions',
         action='store_true',
         help="Don't include '.html' extension in internal links"
