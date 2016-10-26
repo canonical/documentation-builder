@@ -247,7 +247,7 @@ class Builder:
             with open(filepath) as metadata_file:
                 local_dir = path.normpath(
                     path.relpath(
-                        path.dirname(filepath),
+                        path.dirname(filepath) or '.',
                         self.source_path
                     )
                 )
@@ -366,7 +366,8 @@ class Builder:
         local_dirpath = path.dirname(local_filepath)
 
         for item in self.metadata_items:
-            if local_dirpath.startswith(item['path']):
+            path_to_metadata = path.relpath(local_dirpath, item['path'])
+            if '..' not in path_to_metadata:
                 modified = max(modified, item['modified'])
                 metadata_tree = deepcopy(item['content'])
 
@@ -516,9 +517,12 @@ def build(
                 )
 
             try:
+                relative_media_path = path.relpath(media_path, base_directory)
+                branch_media_path = path.join(branch_dir, relative_media_path)
+
                 builder = Builder(
                     source_path=branch_source_path,
-                    source_media_path=media_path,
+                    source_media_path=branch_media_path,
                     output_path=branch_output_path,
                     output_media_path=output_media_path,
                     template=template,
@@ -547,7 +551,7 @@ def build(
                 quiet=quiet
             )
             builder.build()
-        except:
+        except EnvironmentError:
             if not quiet:
                 print(
                     "\nNo metadata.yaml found, is this a repository "
