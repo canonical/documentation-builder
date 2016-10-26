@@ -31,6 +31,7 @@ Optional arguments:
         --site-root {local-url-path}      `# A URL path to the root of the site, for use in the 'home' link in the template`
         --output-path {dirpath}           `# Destination path for the built HTML files (default: ./build)`
         --output-media-path {dirpath}     `# Where to put media files (default: ./build/media)`
+        --build-version-branches          `# Build each branch mentioned in the `versions` file into a subfolder`
         --template-path {filepath}        `# Path to an alternate wrapping template for the built HTML files`
         --media-url {prefix}              `# Prefix for linking to media inside the built HTML files (default: Relative path to built media location, e.g.: ../media)`
         --no-link-extensions              `# Don't include '.html' extension in internal links`
