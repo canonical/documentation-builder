@@ -37,13 +37,34 @@ def relativize(location, original_base_path, new_base_path):
     return path.relpath(abs_location, abs_dirpath)
 
 
-def replace_links(html, old_link_path, new_link_path):
+def replace_link_paths(html, old_link_path, new_link_path):
     """
     In some HTML text, replace old link paths with a new path
     """
 
-    link_search = r'(?<=[\'"]){}(?=/)'.format(
+    link_search = r'((?<=src=["\'])|(?<=href=["\'])){}(?=/)'.format(
         old_link_path.replace('.', '\.')
     )
 
     return re.sub(link_search, new_link_path, html)
+
+
+def matching_metadata(metadata_items, context_path):
+    """
+    Given a list of metadata items and a directory path,
+    return only the items which relate to that path
+    """
+
+    for dirpath, item in sorted(
+        metadata_items.items(), key=sort_paths
+    ):
+        if '..' not in path.relpath(context_path, dirpath):
+            yield (dirpath, item)
+
+
+def sort_paths(item):
+    """
+    Sort key for metadata items to normalise paths
+    """
+
+    return path.normpath(item[0])
