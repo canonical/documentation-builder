@@ -10,3 +10,4 @@ parts/
 prime/
 stage/
 tests/fixtures/copy_media/output_dir/
+build/

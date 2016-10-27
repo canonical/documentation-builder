@@ -68,6 +68,7 @@
     </header>
     <div class="row">
       <div class="theme__wrap">
+        {% if navigation %}
         <div class="col-3 theme__sidebar">
           <nav class="p-sidebar-nav">
             <ul class="p-sidebar-nav__list">
@@ -215,6 +216,7 @@
           }
           </script>
         </div>
+        {% endif %}
         <div class="col-12 theme__main">
           <main id="main-content" class="theme__inner">
             {{ content }}
