@@ -4,7 +4,7 @@ import tempfile
 from collections import Mapping
 from copy import deepcopy
 from glob import glob, iglob
-from os import path
+from os import makedirs, path
 
 # Third party modules
 import frontmatter
@@ -143,7 +143,7 @@ def parse_markdown(parser, template, filepath, metadata):
     with open(filepath, encoding="utf-8") as markdown_file:
         file_parts = frontmatter.loads(markdown_file.read())
 
-    metadata = file_parts.metadata
+    metadata.update(file_parts.metadata)
     metadata['content'] = parser.convert(file_parts.content)
 
     # Now add on any multimarkdown-format metadata
@@ -177,7 +177,7 @@ def parse_markdown(parser, template, filepath, metadata):
     return template.render(metadata)
 
 
-def prepare_branches(base_directory, build_version_branches=False):
+def prepare_branches(base_directory, output_base, versions=False):
     """
     If build_version_branches is true, look for a "versions" file in the
     base_directory and then pull each version branch.
@@ -191,17 +191,22 @@ def prepare_branches(base_directory, build_version_branches=False):
             'Base directory not found: {}'.format(base_directory)
         )
 
-    if build_version_branches:
+    if versions:
         with open(path.join(base_directory, 'versions')) as versions_file:
             lines = versions_file.read().splitlines()
             version_branches = list(filter(None, lines))
 
         for branch in version_branches:
+            branch_output = path.join(output_base, branch)
             branch_dir = tempfile.mkdtemp()
             Repo.clone_from(base_directory, branch_dir, branch=branch)
-            branch_paths.append(branch_dir)
+            branch_paths.append(
+                (branch_dir, branch_output)
+            )
     else:
-        branch_paths.append(base_directory)
+        branch_paths.append(
+            (base_directory, output_base)
+        )
 
     return branch_paths
 
@@ -293,6 +298,9 @@ def write_html(html, output_filepath):
 
     # Check the extension is right
     output_filepath = path.splitext(output_filepath)[0] + '.html'
+    output_dir = path.dirname(output_filepath)
+
+    makedirs(output_dir, exist_ok=True)
 
     with open(
         output_filepath, mode="w", encoding="utf-8"

@@ -329,6 +329,7 @@ class TestOperations(TestCase):
     def test_prepare_branches(self):
         repo = path.join(fixtures_path, 'prepare_branches', 'repo')
         not_repo = path.join(fixtures_path, 'prepare_branches', 'not_repo')
+        output_path = '/output/path'
         no_versions = path.join(
             fixtures_path, 'prepare_branches', 'no_versions'
         )
@@ -338,33 +339,43 @@ class TestOperations(TestCase):
 
         # Error if provided an erroneous base directory
         with self.assertRaises(FileNotFoundError):
-            prepare_branches("some/directory")
+            prepare_branches("some/directory", output_path)
 
         # Error if asked to build branches with no versions file
         with self.assertRaises(FileNotFoundError):
-            prepare_branches(no_versions, build_version_branches=True)
+            prepare_branches(no_versions, output_path, versions=True)
 
         # Error if asked to build branches with no git repository
         with self.assertRaises(GitCommandError):
-            prepare_branches(not_repo, build_version_branches=True)
+            prepare_branches(not_repo, output_path, versions=True)
 
         # Error if asked to build branches with one of the branches missing
         with self.assertRaises(GitCommandError):
-            prepare_branches(missing_branch, build_version_branches=True)
+            prepare_branches(missing_branch, output_path, versions=True)
 
         # When not building versions, all existing directories should work
-        self.assertEqual(prepare_branches(repo), [repo])
-        self.assertEqual(prepare_branches(not_repo), [not_repo])
-        self.assertEqual(prepare_branches(no_versions), [no_versions])
+        self.assertEqual(
+            prepare_branches(repo, output_path),
+            [(repo, output_path)]
+        )
+        self.assertEqual(
+            prepare_branches(not_repo, output_path),
+            [(not_repo, output_path)]
+        )
+        self.assertEqual(
+            prepare_branches(no_versions, output_path),
+            [(no_versions, output_path)]
+        )
 
         # Successfully builds version branches into temp directories
-        branch_paths = prepare_branches(repo, build_version_branches=True)
+        branch_paths = prepare_branches(repo, output_path, versions=True)
         self.assertEqual(len(branch_paths), 2)
-        for branch_path in branch_paths:
+        for (branch_path, branch_output) in branch_paths:
             self.assertTrue(
                 path.isfile(path.join(branch_path, 'metadata.yaml'))
             )
             self.assertTrue(branch_path.startswith('/tmp/'))
+            self.assertTrue(branch_output.startswith(output_path))
 
     def test_relativize_paths(self):
         example_dictionary = {
@@ -523,17 +534,22 @@ class TestOperations(TestCase):
 
     def test_write_html(self):
         html_content = "<html>\n<body>\n<h1>Hello</h1>\n<body>\n</html>"
-        html_path = path.join(fixtures_path, 'write_html', 'file.html')
+        html_dir = path.join(
+            fixtures_path,
+            'write_html',
+            'subdir'
+        )
+        html_filepath = path.join(html_dir, 'file.html')
 
         # Make sure it doesn't exist already
-        if path.exists(html_path):
-            remove(html_path)
+        if path.exists(html_dir):
+            rmtree(html_dir)
 
-        write_html(html_content, html_path)
+        write_html(html_content, html_filepath)
 
-        self.assertTrue(path.isfile(html_path))
-        with open(html_path, encoding="utf-8") as html_file:
+        self.assertTrue(path.isfile(html_filepath))
+        with open(html_filepath, encoding="utf-8") as html_file:
             self.assertEqual(html_file.read(), html_content)
 
         # Delete it again
-        remove(html_path)
+        rmtree(html_dir)
