@@ -65,7 +65,8 @@ class Builder():
         quiet=False
     ):
         self.quiet = quiet
-        media_path = media_path or path.join(base_directory, 'media')
+        source_path = path.join(base_directory, source_folder)
+        media_path = media_path or path.join(source_path, 'media')
         output_media_path = output_media_path or path.join(
             output_path, 'media'
         )
@@ -92,9 +93,9 @@ class Builder():
         )
 
         for (branch_directory, branch_output) in branch_paths:
-            source_path = path.join(branch_directory, source_folder)
+            branch_source = path.join(branch_directory, source_folder)
 
-            metadata_items = find_metadata(source_path)
+            metadata_items = find_metadata(branch_source)
 
             if not metadata_items:
                 self._fail(
@@ -107,7 +108,7 @@ class Builder():
                 )
 
             # Decide which files need changing
-            files = find_files(source_path, branch_output, metadata_items)
+            files = find_files(branch_source, branch_output, metadata_items)
 
             new_files = files[0]
             modified_files = files[1]
@@ -125,13 +126,13 @@ class Builder():
 
             # Create output files
             for filepath in parse_files:
-                relative_filepath = path.relpath(filepath, source_path)
+                relative_filepath = path.relpath(filepath, branch_source)
                 file_directory = path.dirname(filepath)
                 relative_directory = path.dirname(relative_filepath)
 
                 metadata = compile_metadata(
                     metadata_items,
-                    path.relpath(file_directory, source_path)
+                    path.relpath(file_directory, branch_source)
                 )
                 metadata['site_root'] = site_root
 
