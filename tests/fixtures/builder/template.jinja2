@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+  <head>
+    <title>{{ site_title }}</title>
+  </head>
+  <body class="theme">
+    <nav class="p-sidebar-nav">
+      <ul>
+        <li><a href="/">Root</a></li>
+        {% for item in navigation %}
+        <li><a href="{{ item.location }}">{{ item.title }}</a></li>
+        {% endfor %}
+      </ul>
+    </nav>
+    <main>
+      {{ content }}
+    </main>
+  </body>
+</html>
