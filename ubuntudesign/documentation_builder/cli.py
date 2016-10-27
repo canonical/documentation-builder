@@ -1,8 +1,6 @@
 # Core modules
 import argparse
 import sys
-from os import getcwd, path
-from glob import glob
 import pkg_resources
 
 # Local modules
@@ -116,26 +114,8 @@ def parse_arguments():
     else:
         del arguments['version']
 
-    if not arguments['output_media_path']:
-        arguments['output_media_path'] = path.join(
-            arguments['output_path'], 'media'
-        )
-
-    return arguments
-
-
-def preprocess_files(dir_path, preprocessor_string):
-    """
-    Given a directory path and a string representing a python function,
-    run each file in the directory through the function.
-    """
-
-    (package, function) = preprocessor_string.split(':')
-    sys.path.append(getcwd())
-    preprocessor = getattr(__import__(package), function)
-
-    for filename in glob(dir_path + '/**/*.md', recursive=True):
-        preprocessor(filename)
+    # Return only defined arguments
+    return {name: value for name, value in arguments.items() if value}
 
 
 def main():
