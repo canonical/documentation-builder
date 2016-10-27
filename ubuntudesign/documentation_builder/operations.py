@@ -127,7 +127,8 @@ def find_metadata(directory_path):
 
     for filepath in files:
         with open(filepath) as metadata_file:
-            directory = path.relpath(path.dirname(filepath), directory_path)
+            filedir = path.normpath(path.dirname(filepath))
+            directory = path.relpath(filedir, directory_path)
             metadata_items[directory] = {
                 'modified': path.getmtime(filepath),
                 'content': yaml.load(metadata_file.read()) or {}
@@ -306,3 +307,5 @@ def write_html(html, output_filepath):
         output_filepath, mode="w", encoding="utf-8"
     ) as output_file:
         output_file.write(html)
+
+    return output_filepath

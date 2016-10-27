@@ -539,14 +539,16 @@ class TestOperations(TestCase):
             'write_html',
             'subdir'
         )
+        md_filepath = path.join(html_dir, 'file.md')
         html_filepath = path.join(html_dir, 'file.html')
 
         # Make sure it doesn't exist already
         if path.exists(html_dir):
             rmtree(html_dir)
 
-        write_html(html_content, html_filepath)
+        written_filepath = write_html(html_content, md_filepath)
 
+        self.assertEqual(written_filepath, html_filepath)
         self.assertTrue(path.isfile(html_filepath))
         with open(html_filepath, encoding="utf-8") as html_file:
             self.assertEqual(html_file.read(), html_content)
