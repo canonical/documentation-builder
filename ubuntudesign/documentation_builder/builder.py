@@ -64,27 +64,18 @@ class Builder():
         no_cleanup=False,
         quiet=False
     ):
-        self.quiet = quiet
-        source_path = path.join(base_directory, source_folder)
+        # Defaults
+        source_path = path.normpath(path.join(base_directory, source_folder))
         media_path = media_path or path.join(source_path, 'media')
         output_media_path = output_media_path or path.join(
             output_path, 'media'
         )
 
+        self.quiet = quiet
         parser = markdown.Markdown(extensions=markdown_extensions)
 
         with open(template_path, encoding="utf-8") as template_file:
             template = Template(template_file.read())
-
-        relative_media_path = None
-
-        try:
-            if copy_media(media_path, output_media_path):
-                self._print(
-                    "Copied {} to {}".format(media_path, output_media_path)
-                )
-        except EnvironmentError as copy_error:
-            self._warn(str(copy_error))
 
         branch_paths = prepare_branches(
             base_directory,
@@ -93,19 +84,23 @@ class Builder():
         )
 
         for (branch_directory, branch_output) in branch_paths:
-            branch_source = path.join(branch_directory, source_folder)
+            branch_source = path.normpath(
+                path.join(branch_directory, source_folder)
+            )
+
+            if not path.isfile(path.join(branch_source, 'metadata.yaml')):
+                self._fail(
+                    (
+                        "No metadata.yaml found in the source folder.\n\n"
+                        "Documentation repository source folders should "
+                        "contain a ./metadata.yaml file.\n\n"
+                        "See "
+                        "https://github.com/canonicalltd/documentation-builder"
+                        " for instructions.\n"
+                    )
+                )
 
             metadata_items = find_metadata(branch_source)
-
-            if not metadata_items:
-                self._fail(
-                    "\nNo metadata.yaml found, is this a repository "
-                    "of documentation?\n"
-                    "\n"
-                    "See https://github.com/canonicalltd/documentation-builder"
-                    " for instructions.\n",
-                    file=sys.stderr
-                )
 
             # Decide which files need changing
             files = find_files(branch_source, branch_output, metadata_items)
@@ -114,15 +109,26 @@ class Builder():
             modified_files = files[1]
             unmodified_files = files[2]
             uppercase_files = files[3]
-            skip_files = unmodified_files + uppercase_files
             parse_files = new_files + modified_files
 
-            self._print(
-                'Skipping: {}\nParsing: {}'.format(
-                    '\n- '.join(skip_files),
-                    '\n- '.join(parse_files)
+            if uppercase_files:
+                self._print(
+                    'Skipping uppercase files:\n- {}'.format(
+                        '\n- '.join(uppercase_files)
+                    )
                 )
-            )
+            if unmodified_files:
+                self._print(
+                    'Skipping unmodified files:\n- {}'.format(
+                        '\n- '.join(unmodified_files)
+                    )
+                )
+            if parse_files:
+                self._print(
+                    "Processing:\n- {}".format('\n- '.join(parse_files))
+                )
+
+            built_files = []
 
             # Create output files
             for filepath in parse_files:
@@ -158,8 +164,19 @@ class Builder():
 
                 output_filepath = path.join(branch_output, relative_filepath)
 
-                self._print("Writing: {}".format(output_filepath))
-                write_html(html, output_filepath)
+                built_filepath = write_html(html, output_filepath)
+                built_files.append(built_filepath)
+
+        if built_files:
+            self._print("Built:\n- {}".format('\n- '.join(built_files)))
+
+        try:
+            if copy_media(media_path, output_media_path):
+                self._print(
+                    "Copied {} to {}".format(media_path, output_media_path)
+                )
+        except EnvironmentError as copy_error:
+            self._warn("Copying media failed: " + str(copy_error))
 
     def _print(self, message, channel=sys.stdout):
         if not self.quiet:
