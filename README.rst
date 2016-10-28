@@ -20,7 +20,7 @@ Installation
 
     snap install documentation-builder
 
-For more information see `the documentation <docs/en/index.md>`__.
+For more information see `the documentation <docs/en/>`__.
 
 Tests
 ----
