@@ -125,18 +125,18 @@ class Builder():
             if uppercase_files:
                 self._print(
                     'Skipping uppercase files:\n- {}'.format(
-                        '\n- '.join(uppercase_files)
+                        str(uppercase_files)
                     )
                 )
             if unmodified_files:
                 self._print(
                     'Skipping unmodified files:\n- {}'.format(
-                        '\n- '.join(unmodified_files)
+                        str(unmodified_files)
                     )
                 )
             if parse_files:
                 self._print(
-                    "Processing:\n- {}".format('\n- '.join(parse_files))
+                    "Processing:\n- {}".format(str(parse_files))
                 )
 
             built_files = []
@@ -179,7 +179,7 @@ class Builder():
                 built_files.append(built_filepath)
 
         if built_files:
-            self._print("Built:\n- {}".format('\n- '.join(built_files)))
+            self._print("Built:\n- {}".format(str(built_files)))
 
         try:
             if copy_media(media_path, output_media_path):
