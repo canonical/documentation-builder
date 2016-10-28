@@ -1,8 +1,16 @@
+"""
+Most of the builder's actual operations should be tested in
+test_operations.py, so hopefully we don't need to test every
+permutation.
+
+However, here we will try to test at the basic level the overall
+function of the builder.
+"""
+
 # Core modules
 from glob import glob
 from os import path
 from shutil import rmtree
-from unittest import TestCase
 
 # Third party modules
 from bs4 import BeautifulSoup
@@ -14,15 +22,6 @@ from ubuntudesign.documentation_builder.builder import Builder
 
 fixtures_path = path.join(path.dirname(__file__), 'fixtures')
 
-
-"""
-Most of the builder's actual operations should be tested in
-test_operations.py, so hopefully we don't need to test every
-permutation.
-
-However, here we will try to test at the basic level the overall
-function of the builder.
-"""
 
 def test_basic_build():
     base = path.join(fixtures_path, 'builder', 'base')
