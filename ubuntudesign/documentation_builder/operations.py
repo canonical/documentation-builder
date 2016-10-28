@@ -155,7 +155,8 @@ def parse_markdown(parser, template, filepath, metadata):
             If there's a parsererror, it may be because there is no YAML
             frontmatter, so it got confused. Let's just continue.
             """
-            metadata['content'] = file_content
+
+            metadata['content'] = parser.convert(file_content)
 
     # Now add on any multimarkdown-format metadata
     if hasattr(parser, 'Meta'):
