@@ -23,6 +23,7 @@ from ubuntudesign.documentation_builder.operations import (
     replace_media_links,
     write_html
 )
+from ubuntudesign.documentation_builder.builder import markdown_extensions
 
 
 example_dictionary = {
@@ -282,31 +283,45 @@ def test_find_metadata():
 
 
 def test_parse_markdown():
-    filepath = path.join(
-        fixtures_path,
-        'parse_markdown',
-        'markdown.md'
+    function_fixtures = path.join(fixtures_path, 'parse_markdown')
+    frontmatter_path = path.join(
+        function_fixtures,
+        'metadata_markdown_frontmatter.md'
     )
-    html_filepath = path.join(
-        fixtures_path,
-        'parse_markdown',
-        'markdown.html'
+    mmdata_path = path.join(function_fixtures, 'metadata_markdown_mmdata.md')
+    plain_path = path.join(function_fixtures, 'plain_markdown.md')
+    # The "error" file tries to trigger an error with the frontmatter parser,
+    # which should be handled gracefully
+    plain_error_path = path.join(function_fixtures, 'plain_markdown_error.md')
+    plain_output_path = path.join(function_fixtures, 'plain_markdown.html')
+    metadata_output_path = path.join(
+        function_fixtures, 'metadata_markdown.html'
     )
-    metadata = {'site_title': 'My site'}
-    template_path = path.join(
-        fixtures_path,
-        'parse_markdown',
-        'template.jinja2'
-    )
-    parser = markdown.Markdown()
+
+    metadata = {'site_title': 'A site'}
+    template_path = path.join(function_fixtures, 'template.jinja2')
+    parser = markdown.Markdown(markdown_extensions)
     with open(template_path, encoding="utf-8") as template_file:
         template = Template(template_file.read())
 
-    html = parse_markdown(parser, template, filepath, metadata)
+    frontmatter_html = parse_markdown(
+        parser, template, frontmatter_path, metadata
+    )
+    mmdata_html = parse_markdown(parser, template, mmdata_path, metadata)
+    plain_html = parse_markdown(parser, template, plain_path, metadata)
+    plain_html_error = parse_markdown(
+        parser, template, plain_error_path, metadata
+    )
 
-    with open(html_filepath, encoding="utf-8") as html_file:
-        example_html = html_file.read()
-        assert html == example_html
+    with open(plain_output_path, encoding="utf-8") as plain_output_file:
+        expected_plain_html = plain_output_file.read().strip()
+        assert plain_html == expected_plain_html
+        assert plain_html_error == expected_plain_html
+
+    with open(metadata_output_path, encoding="utf-8") as metadata_output_file:
+        expected_metadata_html = metadata_output_file.read().strip()
+        assert frontmatter_html == expected_metadata_html
+        assert mmdata_html == expected_metadata_html
 
 
 def test_prepare_branches():

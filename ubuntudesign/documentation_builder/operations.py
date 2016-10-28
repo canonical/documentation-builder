@@ -1,5 +1,6 @@
 # Core modules
 import re
+import sys
 import tempfile
 from collections import Mapping
 from copy import deepcopy
@@ -141,6 +142,7 @@ def find_metadata(directory_path):
 
 def parse_markdown(parser, template, filepath, metadata):
     parser.reset()
+    metadata = deepcopy(metadata)
 
     # Try to extract frontmatter metadata
     with open(filepath, encoding="utf-8") as markdown_file:
@@ -152,8 +154,10 @@ def parse_markdown(parser, template, filepath, metadata):
             metadata['content'] = parser.convert(file_parts.content)
         except (ScannerError, ParserError):
             """
-            If there's a parsererror, it may be because there is no YAML
-            frontmatter, so it got confused. Let's just continue.
+            If there's a parsererror, it's because frontmatter had to parse
+            the entire file (not finding frontmatter at the top)
+            and encountered an unexpected format somewhere in it.
+            This means the file has no frontmatter, so we can simply continue.
             """
 
             metadata['content'] = parser.convert(file_content)
