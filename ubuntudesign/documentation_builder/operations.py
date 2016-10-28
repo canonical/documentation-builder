@@ -11,6 +11,8 @@ import frontmatter
 import yaml
 from bs4 import BeautifulSoup
 from git import Repo
+from yaml.scanner import ScannerError
+from yaml.parser import ParserError
 
 # Local modules
 from .utilities import (
@@ -142,10 +144,18 @@ def parse_markdown(parser, template, filepath, metadata):
 
     # Try to extract frontmatter metadata
     with open(filepath, encoding="utf-8") as markdown_file:
-        file_parts = frontmatter.loads(markdown_file.read())
+        file_content = markdown_file.read()
 
-    metadata.update(file_parts.metadata)
-    metadata['content'] = parser.convert(file_parts.content)
+        try:
+            file_parts = frontmatter.loads(file_content)
+            metadata.update(file_parts.metadata)
+            metadata['content'] = parser.convert(file_parts.content)
+        except (ScannerError, ParserError):
+            """
+            If there's a parsererror, it may be because there is no YAML
+            frontmatter, so it got confused. Let's just continue.
+            """
+            metadata['content'] = file_content
 
     # Now add on any multimarkdown-format metadata
     if hasattr(parser, 'Meta'):
