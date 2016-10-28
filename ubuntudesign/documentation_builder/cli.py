@@ -74,6 +74,11 @@ def parse_arguments():
         )
     )
     parser.add_argument(
+        '--force',
+        action="store_true",
+        help=("Rebuild all files (assume all files have changed)")
+    )
+    parser.add_argument(
         '--build-version-branches',
         action='store_true',
         help=(

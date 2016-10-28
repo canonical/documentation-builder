@@ -56,6 +56,7 @@ class Builder():
         output_path='build',
         media_path=None,
         output_media_path=None,
+        force=False,
         build_version_branches=False,
         template_path=default_template,
         site_root=None,
@@ -106,8 +107,12 @@ class Builder():
             files = find_files(branch_source, branch_output, metadata_items)
 
             new_files = files[0]
-            modified_files = files[1]
-            unmodified_files = files[2]
+            if force:
+                modified_files = files[1] + files[2]
+                unmodified_files = []
+            else:
+                modified_files = files[1]
+                unmodified_files = files[2]
             uppercase_files = files[3]
             parse_files = new_files + modified_files
 
@@ -133,7 +138,7 @@ class Builder():
             # Create output files
             for filepath in parse_files:
                 relative_filepath = path.relpath(filepath, branch_source)
-                file_directory = path.dirname(filepath)
+                file_directory = path.normpath(path.dirname(filepath))
                 relative_directory = path.dirname(relative_filepath)
 
                 metadata = compile_metadata(
