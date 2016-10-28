@@ -6,6 +6,7 @@ from unittest import TestCase
 
 # Third party modules
 from bs4 import BeautifulSoup
+from git import Repo
 
 # Local modules
 from ubuntudesign.documentation_builder.builder import Builder
@@ -86,13 +87,29 @@ class TestOperations(TestCase):
         rmtree(output)
 
     def test_versions(self):
-        base = path.join(fixtures_path, 'builder', 'base')
+        base = path.join(fixtures_path, 'builder', 'base-repo')
         output = path.join(fixtures_path, 'builder', 'output')
         expected_output = path.join(
             fixtures_path, 'builder', 'output_versions'
         )
+
+        # make sure things don't exist
         if path.exists(output):
             rmtree(output)
+        if path.exists(base):
+            rmtree(base)
+
+        # Clone repository and pull down all branches
+        repo = Repo.clone_from(
+            (
+                'https://github.com/CanonicalLtd/'
+                'documentation-builder-test-builder-repo.git'
+            ),
+            base
+        )
+        origin = repo.remotes.origin
+        repo.create_head('1.0', origin.refs['1.0'])
+        repo.create_head('latest', origin.refs['latest'])
 
         Builder(
             base_directory=base,
@@ -105,6 +122,7 @@ class TestOperations(TestCase):
         self._compare_html_parts(output, expected_output)
 
         rmtree(output)
+        rmtree(base)
 
     def test_output_media_path(self):
         base = path.join(fixtures_path, 'builder', 'base')
