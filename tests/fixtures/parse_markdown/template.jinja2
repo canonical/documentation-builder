@@ -2,6 +2,7 @@
 <head><title>{{ site_title }}</title></head>
 <body>
   <header><h1>{{ title }}</h1></header>
+  {% if toc_items %}<nav><ul>{{ toc_items }}</ul></nav>{% endif %}
   <main>{{ content }}</main>
 </body>
 </html>

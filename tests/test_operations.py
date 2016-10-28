@@ -4,6 +4,7 @@ from os import path, utime
 from shutil import rmtree
 
 # Third party modules
+import yaml
 import markdown
 import pytest
 from git import Repo
@@ -284,6 +285,7 @@ def test_find_metadata():
 
 def test_parse_markdown():
     function_fixtures = path.join(fixtures_path, 'parse_markdown')
+    metadata_path = path.join(function_fixtures, 'metadata.yaml')
     frontmatter_path = path.join(
         function_fixtures,
         'metadata_markdown_frontmatter.md'
@@ -298,7 +300,9 @@ def test_parse_markdown():
         function_fixtures, 'metadata_markdown.html'
     )
 
-    metadata = {'site_title': 'A site'}
+    with open(metadata_path, encoding="utf-8") as metadata_file:
+        metadata = yaml.load(metadata_file.read())
+
     template_path = path.join(function_fixtures, 'template.jinja2')
     parser = markdown.Markdown(markdown_extensions)
     with open(template_path, encoding="utf-8") as template_file:

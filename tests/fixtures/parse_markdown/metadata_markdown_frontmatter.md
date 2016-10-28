@@ -1,5 +1,6 @@
 ---
 title: "A page"
+table_of_contents: True
 ---
 
 # Title
