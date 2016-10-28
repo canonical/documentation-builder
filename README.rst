@@ -1,7 +1,10 @@
 Ubuntu documentation builder
 ============================
 
-![build status](https://api.travis-ci.org/canonicalltd/documentation-builder.svg?branch=master)
+.. figure:: https://travis-ci.org/CanonicalLtd/documentation-builder.svg?branch=master
+   :alt: build status
+
+   build status
 
 A tool for building a set of documentation files in HTML format, from a
 remote git repository containing markdown files.
@@ -13,4 +16,4 @@ Installation
 
     snap install documentation-builder
 
-For more information see [the documentation](docs/en/index.md).
+For more information see `the documentation <docs/en/index.md>`__.
