@@ -13,7 +13,7 @@ assert sys.version_info >= (3, 5), (
 
 setup(
     name='ubuntudesign.documentation-builder',
-    version='1.0.0-rc2',
+    version='1.0.0-rc3',
     author='Canonical webteam',
     author_email='robin+pypi@canonical.com',
     url='https://github.com/ubuntudesign/documentation-builder',
