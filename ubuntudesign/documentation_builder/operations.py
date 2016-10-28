@@ -1,6 +1,5 @@
 # Core modules
 import re
-import sys
 import tempfile
 from collections import Mapping
 from copy import deepcopy
@@ -44,9 +43,7 @@ def copy_media(media_path, output_media_path):
     Copy media files from source_media_path to output_media_path
     """
 
-    media_paths_match = path.relpath(
-        media_path, output_media_path
-    ) == '.'
+    media_paths_match = path.relpath(media_path, output_media_path) == '.'
 
     if not media_paths_match:
         mergetree(media_path, output_media_path)

@@ -9,12 +9,14 @@ function of the builder.
 
 # Core modules
 from glob import glob
-from os import path
+from os import path, utime
 from shutil import rmtree
 
 # Third party modules
 from bs4 import BeautifulSoup
+from io import StringIO
 from git import Repo
+from pytest import raises
 
 # Local modules
 from ubuntudesign.documentation_builder.builder import Builder
@@ -23,13 +25,117 @@ from ubuntudesign.documentation_builder.builder import Builder
 fixtures_path = path.join(path.dirname(__file__), 'fixtures')
 
 
-def test_basic_build():
-    base = path.join(fixtures_path, 'builder', 'base')
+def test_no_metadata():
+    base = path.join(fixtures_path, 'builder', 'no-metadata')
     output = path.join(fixtures_path, 'builder', 'output')
-    expected_output = path.join(fixtures_path, 'builder', 'output_basic')
+
     if path.exists(output):
         rmtree(output)
 
+    with raises(SystemExit):
+        Builder(
+            base_directory=base,
+            output_path=output,
+            quiet=True
+        )
+
+    assert not path.exists(output)
+
+
+def test_quiet():
+    fixtures = path.join(fixtures_path, 'builder')
+    base = path.join(fixtures, 'base')
+    output = path.join(fixtures, 'output')
+
+    if path.exists(output):
+        rmtree(output)
+
+    mock_out = StringIO()
+    mock_err = StringIO()
+
+    Builder(
+        base_directory=base,
+        output_path=output,
+        out=mock_out,
+        err=mock_err,
+    )
+
+    assert mock_out.getvalue() > ''
+    assert mock_err.getvalue() == ''
+
+    mock_out = StringIO()
+    mock_err = StringIO()
+
+    Builder(
+        base_directory=base,
+        output_path=output,
+        quiet=True,
+        out=mock_out,
+        err=mock_err,
+    )
+
+    assert mock_out.getvalue() == ''
+    assert mock_err.getvalue() == ''
+
+    rmtree(output)
+
+
+def test_basic_build():
+    fixtures = path.join(fixtures_path, 'builder')
+    base = path.join(fixtures, 'base')
+    output = path.join(fixtures, 'output')
+    index = path.join(fixtures, 'output', 'en', 'index.html')
+    expected_output = path.join(fixtures, 'output_basic')
+    if path.exists(output):
+        rmtree(output)
+
+    # Build normally
+    Builder(
+        base_directory=base,
+        output_path=output,
+        quiet=True
+    )
+
+    _compare_trees(output, expected_output)
+    _compare_html_parts(output, expected_output)
+
+    # Check changes aren't updated
+    # Set far future modified time
+    future = 2000000000
+    utime(index, (future, future))
+    Builder(
+        base_directory=base,
+        output_path=output,
+        quiet=True
+    )
+    # Check it hasn't been modified
+    assert path.getmtime(index) == future
+
+    # Check we can force updates
+    Builder(
+        base_directory=base,
+        output_path=output,
+        force=True,
+        quiet=True
+    )
+    # Check it's been modified now
+    assert path.getmtime(index) < future
+
+    _compare_trees(output, expected_output)
+    _compare_html_parts(output, expected_output)
+
+    rmtree(output)
+
+
+def test_no_media():
+    fixtures = path.join(fixtures_path, 'builder')
+    base = path.join(fixtures, 'base-no-media')
+    output = path.join(fixtures, 'output')
+    expected_output = path.join(fixtures, 'output_no_media')
+    if path.exists(output):
+        rmtree(output)
+
+    # Build normally
     Builder(
         base_directory=base,
         output_path=output,

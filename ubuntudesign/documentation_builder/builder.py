@@ -63,8 +63,15 @@ class Builder():
         media_url=None,
         no_link_extensions=False,
         no_cleanup=False,
-        quiet=False
+        quiet=False,
+        out=sys.stdout,
+        err=sys.stderr,
     ):
+        # Properties
+        self.quiet = quiet
+        self._out = out
+        self._err = err
+
         # Defaults
         source_path = path.normpath(path.join(base_directory, source_folder))
         media_path = media_path or path.join(source_path, 'media')
@@ -72,7 +79,6 @@ class Builder():
             output_path, 'media'
         )
 
-        self.quiet = quiet
         parser = markdown.Markdown(extensions=markdown_extensions)
 
         with open(template_path, encoding="utf-8") as template_file:
@@ -183,13 +189,13 @@ class Builder():
         except EnvironmentError as copy_error:
             self._warn("Copying media failed: " + str(copy_error))
 
-    def _print(self, message, channel=sys.stdout):
+    def _print(self, message, channel=None):
         if not self.quiet:
-            print(message, file=channel)
+            print(message, file=channel or self._out)
 
     def _warn(self, message):
-        self._print("Warning: " + message, channel=sys.stderr)
+        self._print("Warning: " + message, channel=self._err)
 
     def _fail(self, message):
-        self._print("Error: " + message, channel=sys.stderr)
+        self._print("Error: " + message, channel=self._err)
         sys.exit(1)

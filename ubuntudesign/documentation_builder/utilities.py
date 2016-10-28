@@ -9,6 +9,9 @@ def mergetree(src, dst, symlinks=False, ignore=None):
     Deep-merge two directory trees, overwriting changed files
     """
 
+    if not path.isdir(src):
+        raise EnvironmentError('Source tree not found: ' + src)
+
     makedirs(dst, exist_ok=True)
     for item in listdir(src):
         source = path.join(src, item)
