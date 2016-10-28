@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 # Core
 import sys
 from setuptools import setup

@@ -17,3 +17,13 @@ Installation
     snap install documentation-builder
 
 For more information see `the documentation <docs/en/index.md>`__.
+
+Tests
+----
+
+To run tests:
+
+... code:: bash
+
+    ./setup.py test
+
