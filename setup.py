@@ -44,7 +44,6 @@ setup(
     tests_require=[
         "mock==2.0.0",
         "nose==1.3.7",
-        "pytest==3.0.3",
         "pytest-cov==2.4.0",
     ],
 )
