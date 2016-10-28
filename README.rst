@@ -1,12 +1,11 @@
 Ubuntu documentation builder
 ============================
 
-.. figure:: https://travis-ci.org/CanonicalLtd/documentation-builder.svg?branch=master
+.. image:: https://travis-ci.org/CanonicalLtd/documentation-builder.svg?branch=master
    :alt: build status
    :title: status of tests
    :target: https://travis-ci.org/CanonicalLtd/documentation-builder
-
-.. figure:: https://coveralls.io/repos/github/CanonicalLtd/documentation-builder/badge.svg?branch=master
+.. image:: https://coveralls.io/repos/github/CanonicalLtd/documentation-builder/badge.svg?branch=master
    :alt: code coverage
    :title: code coverage
    :target: https://coveralls.io/github/CanonicalLtd/documentation-builder
