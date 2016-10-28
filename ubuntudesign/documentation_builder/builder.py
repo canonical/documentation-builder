@@ -134,10 +134,6 @@ class Builder():
                         str(unmodified_files)
                     )
                 )
-            if parse_files:
-                self._print(
-                    "Processing:\n- {}".format(str(parse_files))
-                )
 
             built_files = []
 
