@@ -1,11 +1,12 @@
 # Core modules
 from copy import deepcopy
-from os import path, remove
+from os import path, utime
 from unittest import TestCase
 from shutil import rmtree
 
 # Third party modules
 import markdown
+from git import Repo
 from git.exc import GitCommandError
 from jinja2 import Template
 
@@ -184,6 +185,34 @@ class TestOperations(TestCase):
         source_dir = path.join(fixtures_path, 'find_files', 'source_dir')
         output_dir = path.join(fixtures_path, 'find_files', 'output_dir')
 
+        paths = {
+            'new_file': path.join(source_dir, 'subdir', 'new-file.md'),
+            'readme': path.join(source_dir, 'subdir', 'README.md'),
+            'unchanged_md': path.join(source_dir, 'unchanged.md'),
+            'unchanged_html': path.join(output_dir, 'unchanged.html'),
+            'unchanged_sub_md': path.join(
+                source_dir, 'subdir', 'unchanged.md'
+            ),
+            'unchanged_sub_html': path.join(
+                output_dir, 'subdir', 'unchanged.html'
+            ),
+            'modified_md': path.join(source_dir, 'subdir', 'modified_file.md'),
+            'modified_html': path.join(
+                output_dir, 'subdir', 'modified_file.html'
+            )
+        }
+
+        # Set modified times
+        old = 1000000000
+        newish = 1500000000
+        new = 2000000000
+        utime(paths['unchanged_md'], (old, old))
+        utime(paths['unchanged_html'], (newish, newish))
+        utime(paths['unchanged_sub_md'], (old, old))
+        utime(paths['unchanged_sub_html'], (newish, newish))
+        utime(paths['modified_md'], (newish, newish))
+        utime(paths['modified_html'], (old, old))
+
         files = find_files(source_dir, output_dir, {})
 
         # Check it categorieses each file in the fixtures correctly
@@ -192,31 +221,19 @@ class TestOperations(TestCase):
         unmodified_files = files[2]
         uppercase_files = files[3]
 
-        self.assertEqual(
-            new_files,
-            [path.join(source_dir, 'subdir', 'new-file.md')]
-        )
-        self.assertEqual(
-            modified_files,
-            [path.join(source_dir, 'subdir', 'modified_file.md')]
-        )
+        self.assertEqual(new_files, [paths['new_file']])
+        self.assertEqual(modified_files, [paths['modified_md']])
         self.assertEqual(
             unmodified_files,
-            [
-                path.join(source_dir, 'unchanged.md'),
-                path.join(source_dir, 'subdir', 'unchanged.md')
-            ]
+            [paths['unchanged_md'], paths['unchanged_sub_md']]
         )
-        self.assertEqual(
-            uppercase_files,
-            [path.join(source_dir, 'subdir', 'README.md')]
-        )
+        self.assertEqual(uppercase_files, [paths['readme']])
 
         # Check it honours newer metadata
         files = find_files(
             source_dir,
             output_dir,
-            {'.': {'modified': 2000000000, 'content': {}}}
+            {'.': {'modified': new, 'content': {}}}
         )
 
         new_files = files[0]
@@ -224,32 +241,23 @@ class TestOperations(TestCase):
         unmodified_files = files[2]
         uppercase_files = files[3]
 
-        self.assertEqual(
-            new_files,
-            [path.join(source_dir, 'subdir', 'new-file.md')]
-        )
+        self.assertEqual(new_files, [paths['new_file']])
         self.assertEqual(
             modified_files,
             [
-                path.join(source_dir, 'unchanged.md'),
-                path.join(source_dir, 'subdir', 'modified_file.md'),
-                path.join(source_dir, 'subdir', 'unchanged.md')
+                paths['unchanged_md'],
+                paths['modified_md'],
+                paths['unchanged_sub_md']
             ]
         )
-        self.assertEqual(
-            unmodified_files,
-            []
-        )
-        self.assertEqual(
-            uppercase_files,
-            [path.join(source_dir, 'subdir', 'README.md')]
-        )
+        self.assertEqual(unmodified_files, [])
+        self.assertEqual(uppercase_files, [paths['readme']])
 
         # Check it honours newer metadata
         files = find_files(
             source_dir,
             output_dir,
-            {'subdir': {'modified': 2000000000, 'content': {}}}
+            {'subdir': {'modified': new, 'content': {}}}
         )
 
         new_files = files[0]
@@ -257,10 +265,7 @@ class TestOperations(TestCase):
         unmodified_files = files[2]
         uppercase_files = files[3]
 
-        self.assertEqual(
-            new_files,
-            [path.join(source_dir, 'subdir', 'new-file.md')]
-        )
+        self.assertEqual(new_files, [paths['new_file']])
         self.assertEqual(
             modified_files,
             [
@@ -268,14 +273,8 @@ class TestOperations(TestCase):
                 path.join(source_dir, 'subdir', 'unchanged.md')
             ]
         )
-        self.assertEqual(
-            unmodified_files,
-            [path.join(source_dir, 'unchanged.md')]
-        )
-        self.assertEqual(
-            uppercase_files,
-            [path.join(source_dir, 'subdir', 'README.md')]
-        )
+        self.assertEqual(unmodified_files, [paths['unchanged_md']])
+        self.assertEqual(uppercase_files, [paths['readme']])
 
     def test_find_metadata(self):
         source_dir = path.join(fixtures_path, 'find_metadata', 'source_dir')
@@ -327,55 +326,78 @@ class TestOperations(TestCase):
             self.assertEqual(html, example_html)
 
     def test_prepare_branches(self):
-        repo = path.join(fixtures_path, 'prepare_branches', 'repo')
+        repo_path = path.join(fixtures_path, 'prepare_branches', 'repo')
         not_repo = path.join(fixtures_path, 'prepare_branches', 'not_repo')
-        output_path = '/output/path'
-        no_versions = path.join(
-            fixtures_path, 'prepare_branches', 'no_versions'
+
+        # Clean up repository
+        if path.exists(repo_path):
+            rmtree(repo_path)
+
+        # Clone repository and pull down all branches
+        repo = Repo.clone_from(
+            (
+                "https://github.com/CanonicalLtd/"
+                "documentation-builder-test-prepare-branches.git"
+            ),
+            repo_path
         )
-        missing_branch = path.join(
-            fixtures_path, 'prepare_branches', 'missing_branch'
-        )
+        origin = repo.remotes.origin
+        repo.create_head('no-versions', origin.refs['no-versions'])
+        repo.create_head('missing-branch', origin.refs['missing-branch'])
+        repo.create_head('1.0', origin.refs['1.0'])
+        repo.create_head('latest', origin.refs['latest'])
 
         # Error if provided an erroneous base directory
         with self.assertRaises(FileNotFoundError):
-            prepare_branches("some/directory", output_path)
-
-        # Error if asked to build branches with no versions file
-        with self.assertRaises(FileNotFoundError):
-            prepare_branches(no_versions, output_path, versions=True)
+            prepare_branches("some/directory", 'output')
 
         # Error if asked to build branches with no git repository
         with self.assertRaises(GitCommandError):
-            prepare_branches(not_repo, output_path, versions=True)
+            prepare_branches(not_repo, 'output', versions=True)
 
+        repo.heads['no-versions'].checkout()
+        # Error if asked to build branches with no versions file
+        with self.assertRaises(FileNotFoundError):
+            prepare_branches(repo_path, 'output', versions=True)
+
+        repo.heads['missing-branch'].checkout()
         # Error if asked to build branches with one of the branches missing
         with self.assertRaises(GitCommandError):
-            prepare_branches(missing_branch, output_path, versions=True)
+            prepare_branches(repo_path, 'output', versions=True)
 
         # When not building versions, all existing directories should work
+        repo.heads['master'].checkout()
         self.assertEqual(
-            prepare_branches(repo, output_path),
-            [(repo, output_path)]
+            prepare_branches(repo_path, 'output'),
+            [(repo_path, 'output')]
+        )
+        repo.heads['no-versions'].checkout()
+        self.assertEqual(
+            prepare_branches(repo_path, 'output'),
+            [(repo_path, 'output')]
+        )
+        repo.heads['missing-branch'].checkout()
+        self.assertEqual(
+            prepare_branches(repo_path, 'output'),
+            [(repo_path, 'output')]
         )
         self.assertEqual(
-            prepare_branches(not_repo, output_path),
-            [(not_repo, output_path)]
-        )
-        self.assertEqual(
-            prepare_branches(no_versions, output_path),
-            [(no_versions, output_path)]
+            prepare_branches(not_repo, 'output'),
+            [(not_repo, 'output')]
         )
 
         # Successfully builds version branches into temp directories
-        branch_paths = prepare_branches(repo, output_path, versions=True)
+        repo.heads['master'].checkout()
+        branch_paths = prepare_branches(repo_path, 'output', versions=True)
         self.assertEqual(len(branch_paths), 2)
         for (branch_path, branch_output) in branch_paths:
             self.assertTrue(
                 path.isfile(path.join(branch_path, 'metadata.yaml'))
             )
             self.assertTrue(branch_path.startswith('/tmp/'))
-            self.assertTrue(branch_output.startswith(output_path))
+            self.assertTrue(branch_output.startswith('output'))
+
+        rmtree(repo_path)
 
     def test_relativize_paths(self):
         example_dictionary = {

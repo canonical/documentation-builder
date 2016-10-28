@@ -11,3 +11,4 @@ prime/
 stage/
 tests/fixtures/copy_media/output_dir/
 build/
+tests/fixtures/prepare_branches/repo/
