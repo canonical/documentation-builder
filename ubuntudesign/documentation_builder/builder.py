@@ -167,7 +167,10 @@ class Builder():
                     relative_directory
                 )
 
-                html = replace_internal_links(html)
+                html = replace_internal_links(
+                    html,
+                    extensions=(not no_link_extensions)
+                )
 
                 output_filepath = path.join(branch_output, relative_filepath)
 
