@@ -86,7 +86,7 @@ in each file, which will override any keys from `metadata.yaml` files.
 You can define whatever metadata you like, and then make use of it by
 providing your own template to the builder with `--template-path`.
 
-However, in the [default template](https://github.com/CanonicalLtd/documentation-builder/blob/master/ubuntudesign/documentation_builder/resources/wrapper.jinja2), the following options are defined:
+However, in the [default template](https://github.com/CanonicalLtd/documentation-builder/blob/master/ubuntudesign/documentation_builder/resources/template.html), the following options are defined:
 
 ### Top level config options
 

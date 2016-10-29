@@ -33,7 +33,7 @@ from .operations import (
 default_template = path.join(
     path.dirname(__file__),
     'resources',
-    'wrapper.jinja2'
+    'template.html'
 )
 markdown_extensions = [
     MetaExtension(),
