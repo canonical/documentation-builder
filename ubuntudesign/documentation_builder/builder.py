@@ -25,6 +25,7 @@ from .operations import (
     replace_media_links,
     parse_markdown,
     prepare_branches,
+    set_active_navigation_items,
     write_html
 )
 
@@ -148,6 +149,15 @@ class Builder():
                     path.relpath(file_directory, branch_source)
                 )
                 metadata['site_root'] = site_root
+
+                navigation = metadata.get('navigation')
+
+                # Breadcrumbs
+                if navigation:
+                    metadata['breadcrumbs'] = set_active_navigation_items(
+                        path.basename(filepath),
+                        navigation
+                    )
 
                 html = parse_markdown(parser, template, filepath, metadata)
 

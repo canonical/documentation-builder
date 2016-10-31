@@ -304,7 +304,43 @@ def replace_media_links(
     return html
 
 
+def set_active_navigation_items(filename, items, parents=[]):
+    """
+    Given a list of navigation items and a filename,
+    recursively set the "active" navigation which links to that filename,
+    and return a list of nodes that lead to that file.
+    """
+
+    name = path.splitext(path.normpath(filename))[0]
+    active_items = []
+
+    for item in items:
+        location = item.get('location')
+
+        if location:
+            location_name = path.splitext(
+                path.normpath(location)
+            )[0]
+
+            if location_name == name:
+                item['active'] = True
+                active_items = parents + [item]
+                break
+
+        if not active_items and item.get('children'):
+            active_items = set_active_navigation_items(
+                filename,
+                item['children'],
+                parents + [item]
+            )
+            if active_items:
+                break
+
+    return active_items
+
+
 def write_html(html, output_filepath):
+
     """
     Write HTML content to an HTML file
     """
