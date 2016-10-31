@@ -98,6 +98,10 @@
         display: none;
       }
 
+      .p-breadcrumbs {
+        display: none;
+      }
+
       @media (max-width: 767px) {
         .p-navigation__logo {
           margin: 0 1rem;
@@ -123,6 +127,12 @@
 
         .p-sidebar-nav {
           display: none;
+        }
+
+        .p-breadcrumbs {
+          display: block;
+          margin-left: 1rem;
+          margin-top: 1rem;
         }
 
         .theme__sidebar-toggle:checked + .p-sidebar-nav {
@@ -160,7 +170,7 @@
               {% for item in navigation %}
               <li class="p-sidebar-nav__group">
                 {% if item.location %}
-                <a class="p-sidebar-nav__link" href="{{ item.location }}">{{ item.title }}</a>
+                <a class="p-sidebar-nav__link {% if item.active %}is-active{% endif %}" href="{{ item.location }}">{{ item.title }}</a>
                 {% else %}
                 <h4 class="p-sidebar-nav__header">{{ item.title }}</h4>
                 {% endif %}
@@ -171,7 +181,7 @@
                     {% for child in item.children %}
                     <li>
                       {% if child.location %}
-                      <a class="p-sidebar-nav__link" href="{{ child.location }}">
+                      <a class="p-sidebar-nav__link {% if child.active %}is-active{% endif %}" href="{{ child.location }}">
                         {{ child.title }}
                       </a>
                       {% else %}
@@ -184,7 +194,7 @@
                           {% for grandchild in child.children %}
                           <li>
                             {% if grandchild.location %}
-                            <a class="p-sidebar-nav__link" href="{{ grandchild.location }}">
+                            <a class="p-sidebar-nav__link {% if grandchild.active %}is-active{% endif %}" href="{{ grandchild.location }}">
                               {{ grandchild.title }}
                             </a>
                             {% else %}
@@ -258,14 +268,6 @@
             return Boolean(navElement.querySelector('ul'));
           }
 
-          /* Add active links */
-          var navLinks = document.querySelectorAll('.p-sidebar-nav a');
-          navLinks.forEach(function(link) {
-            if (link.href.replace(/index(.html)?/, '') == location.href.replace(/index(.html)?/, '')) {
-              link.classList.add('is-active');
-            }
-          });
-
           /**
            * Add "collaped" classes to all provided list items
            * unless they're "active".
@@ -305,6 +307,15 @@
           }
           </script>
         </div>
+        <nav class="p-breadcrumbs">
+          {% for breadcrumb in breadcrumbs %}
+            {% if breadcrumb.active or not breadcrumb.location %}
+              <span class="p-breadcrumbs__link">{{ breadcrumb.title }}</span>
+            {% else %}
+              <a class="p-breadcrumbs__link" href="{{ breadcrumb.location }}">{{ breadcrumb.title }}</a>
+            {% endif %}
+          {% endfor %}
+        </nav>
         {% endif %}
         <div class="col-12 theme__main">
           <main id="main-content" class="theme__inner">

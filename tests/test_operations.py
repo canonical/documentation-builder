@@ -22,6 +22,7 @@ from ubuntudesign.documentation_builder.operations import (
     relativize_paths,
     replace_internal_links,
     replace_media_links,
+    set_active_navigation_items,
     write_html
 )
 from ubuntudesign.documentation_builder.builder import markdown_extensions
@@ -539,6 +540,57 @@ def test_replace_media_links():
         '\n\n<a href="/static/image.png">link</a>\n'
     )
     assert output_absolute == expected_output_absolute
+
+
+def test_set_active_navigation_items():
+    navigation_items = [
+        {
+            'title': 'parent one',
+            'location': '../child',
+
+            'children': [{'title': 'child one'}]
+        },
+        {
+            'title': 'parent two',
+
+            'children': [
+                {
+                    'title': 'child two',
+                    'location': 'childtwo.html',
+
+                    'children': [
+                        {'title': 'grandchild 1', 'location': 'grandchild1'},
+                        {'title': 'grandchild 2', 'location': 'grandchild2.md'}
+                    ]
+                }
+            ]
+        },
+        {'title': 'childfree parent'}
+    ]
+
+    expected_path = [
+        {'title': 'parent two'},
+        {'title': 'child two', 'location': 'childtwo.html'},
+        {'title': 'grandchild 2', 'location': 'grandchild2.md', 'active': True}
+    ]
+
+    active_path = set_active_navigation_items(
+        'grandchild2.html',
+        navigation_items
+    )
+
+    for index, expected_item in enumerate(expected_path):
+        active_item = active_path[index]
+        assert expected_item['title'] == active_item['title']
+        assert expected_item.get('location') == active_item.get('location')
+        assert expected_item.get('active') == active_item.get('active')
+
+    assert not navigation_items[0].get('active')
+    assert not navigation_items[1].get('active')
+    assert not navigation_items[2].get('active')
+    assert not navigation_items[1]['children'][0].get('active')
+    assert not navigation_items[1]['children'][0]['children'][0].get('active')
+    assert navigation_items[1]['children'][0]['children'][1].get('active')
 
 
 def test_write_html():
