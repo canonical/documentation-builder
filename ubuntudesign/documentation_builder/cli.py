@@ -1,12 +1,10 @@
 # Core modules
 import argparse
 import sys
-from os import getcwd, path
-from glob import glob
 import pkg_resources
 
 # Local modules
-from .builder import build
+from .builder import Builder
 
 
 def parse_arguments():
@@ -23,51 +21,62 @@ def parse_arguments():
 
     parser.add_argument(
         '--base-directory',
-        default=".",
-        help="The path to the base directory to build from."
+        help=(
+            "The base path for the documentation repository "
+            "(defaults to current directory)"
+        )
     )
     parser.add_argument(
         '--source-folder',
-        default='.',
         help=(
-            "Path to the folder containing the markdown source files "
-            "inside the base directory (default: .)"
+            "Path inside the base directory to the folder containing "
+            "the markdown source files (default: .)"
         )
     )
     parser.add_argument(
         '--media-path',
-        default="media",
         help=(
-            "Path to the folder containing media files relative to the current"
-            "directory (default: ./media)"
+            "Path to the folder containing media files relative to "
+            "the current directory "
+            "(defaults to a 'media' folder inside the source folder)"
         )
     )
     parser.add_argument(
         '--output-path',
-        default="build",
-        help="Destination path for the built HTML files (default: .)"
+        help="Destination path for the built HTML files (default: ./build)"
     )
     parser.add_argument(
         '--output-media-path',
-        help="Where to put media files (default: ./build/media)"
+        help=(
+            "Where to put media files "
+            "(defaults to a 'media' folder inside the output directory)"
+        )
     )
     parser.add_argument(
         '--template-path',
-        help="Path to an alternate wrapping template for the built HTML files"
+        help=(
+            "Path to an alternate wrapping template for the built HTML files "
+            "(defaults to using the built-in template)"
+        )
     )
     parser.add_argument(
         '--site-root',
         help=(
             "A URL path to the root of the site, for use in the 'home' "
-            "link in the template."
+            "link in the template (defaults to none)"
         )
     )
     parser.add_argument(
         '--media-url',
         help=(
-            "Prefix for linking to media inside the built HTML files "
-            "(default: Relative path to built media location, e.g.: ../media)"
+            "Override prefix for linking to media inside the built HTML files "
+            "(defaults to using relative paths, e.g.: ../media)"
         )
+    )
+    parser.add_argument(
+        '--force',
+        action="store_true",
+        help=("Rebuild all files (assume all files have changed)")
     )
     parser.add_argument(
         '--build-version-branches',
@@ -110,26 +119,8 @@ def parse_arguments():
     else:
         del arguments['version']
 
-    if not arguments['output_media_path']:
-        arguments['output_media_path'] = path.join(
-            arguments['output_path'], 'media'
-        )
-
-    return arguments
-
-
-def preprocess_files(dir_path, preprocessor_string):
-    """
-    Given a directory path and a string representing a python function,
-    run each file in the directory through the function.
-    """
-
-    (package, function) = preprocessor_string.split(':')
-    sys.path.append(getcwd())
-    preprocessor = getattr(__import__(package), function)
-
-    for filename in glob(dir_path + '/**/*.md', recursive=True):
-        preprocessor(filename)
+    # Return only defined arguments
+    return {name: value for name, value in arguments.items() if value}
 
 
 def main():
@@ -139,7 +130,7 @@ def main():
     """
 
     arguments = parse_arguments()
-    build(**arguments)
+    Builder(**arguments)
 
 
 if __name__ == "__main__":

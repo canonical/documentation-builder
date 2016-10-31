@@ -1,0 +1,7 @@
+site_title: "The title of my site"
+navigation:
+    - title: French page
+      location: fr/index.md
+
+    - title: English page
+      location: en/index.md
