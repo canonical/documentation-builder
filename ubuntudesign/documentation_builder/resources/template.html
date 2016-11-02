@@ -119,10 +119,14 @@
           display: block;
           margin-left: auto;
           float: right;
-          margin-right: 1rem;
           cursor: pointer;
-          width: auto;
-          text-transform: uppercase;
+          text-indent: -1000px;
+          background-image: url('https://assets.ubuntu.com/v1/39a96c62-navigation-menu-black.svg');
+          width: 38px;
+          height: 29px;
+          margin-right: 0.5rem;
+          background-repeat:no-repeat;
+          background-position: center center;
         }
 
         .p-sidebar-nav {
@@ -137,10 +141,6 @@
 
         .theme__sidebar-toggle:checked + .p-sidebar-nav {
           display: block;
-        }
-
-        .theme__title {
-          line-height: 2.1;
         }
       }
     </style>
@@ -158,7 +158,7 @@
           <a href="#main-content">Jump to main content</a>
         </span>
       </nav>
-      <label for="nav-toggle-checkbox" class="theme__sidebar-toggle-button p-button--neutral">Menu</label>
+      <label for="nav-toggle-checkbox" class="theme__sidebar-toggle-button">Menu</label>
     </header>
     <div class="row">
       <div class="theme__wrap">
