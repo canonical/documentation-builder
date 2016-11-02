@@ -45,7 +45,8 @@
       .theme__logo {
         vertical-align: middle;
         height: 28px;
-        margin-right: 0.5rem;
+        float: left;
+        margin-right: 6px;
         margin-bottom: 1px;
       }
 
@@ -76,6 +77,36 @@
         border: 1px solid #cdcdcd;
       }
 
+      .theme__site-title {
+        font-size: 1.2rem;
+        margin-bottom: 0;
+        margin-top: 1px;
+        color: #333;
+      }
+
+      .theme > .theme__header {
+        position: relative;
+        padding-right: 36px;
+      }
+
+      .theme__sidebar-toggle-button {
+        display: none;
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        cursor: pointer;
+        text-indent: -1000px;
+        background-image: url('https://assets.ubuntu.com/v1/39a96c62-navigation-menu-black.svg');
+        width: 38px;
+        height: 32px;
+        background-repeat: no-repeat;
+        background-position: center center;
+      }
+
+      .theme__sidebar-toggle {
+        display: none;
+      }
+
       /**
        * Fixes
        * @TODO: Move upstream into docs-vanilla-theme
@@ -92,10 +123,6 @@
         .p-sidebar-nav__header {
             font-size: 1.3125rem;
         }
-      }
-
-      .theme__sidebar-toggle-button, .theme__sidebar-toggle {
-        display: none;
       }
 
       .p-breadcrumbs {
@@ -117,16 +144,6 @@
 
         .theme__sidebar-toggle-button {
           display: block;
-          margin-left: auto;
-          float: right;
-          cursor: pointer;
-          text-indent: -1000px;
-          background-image: url('https://assets.ubuntu.com/v1/39a96c62-navigation-menu-black.svg');
-          width: 38px;
-          height: 32px;
-          margin-right: 0.5rem;
-          background-repeat:no-repeat;
-          background-position: center center;
         }
 
         .p-sidebar-nav {
@@ -146,11 +163,11 @@
     </style>
   </head>
   <body class="theme">
-    <header class="p-navigation" role="banner">
-      <div class="p-navigation__logo theme__title">
+    <header class="theme__header p-navigation" role="banner">
+      <div class="p-navigation__logo">
         {% if site_root %}<a class="p-navigation__link" href="{{ site_root }}">{% endif %}
           {% if site_logo_url %}<img class="theme__logo" src="{{ site_logo_url }}" alt="{{ site_title }} logo" />{% endif %}
-          {{ site_title if site_title else 'Documentation' }}
+          <h1 class="theme__site-title">{{ site_title if site_title else 'Documentation' }}</h1>
         {% if site_root %}</a>{% endif %}
       </div>
       <nav class="p-navigation__nav">
