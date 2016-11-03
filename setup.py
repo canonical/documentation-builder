@@ -1,3 +1,5 @@
+#! /usr/bin/env python3
+
 # Core
 import sys
 from setuptools import setup
@@ -11,7 +13,7 @@ assert sys.version_info >= (3, 5), (
 
 setup(
     name='ubuntudesign.documentation-builder',
-    version='0.4.5',
+    version='1.0.0-rc11',
     author='Canonical webteam',
     author_email='robin+pypi@canonical.com',
     url='https://github.com/ubuntudesign/documentation-builder',
@@ -39,5 +41,10 @@ setup(
         "beautifulsoup4==4.5.1",
     ],
     setup_requires=['pytest-runner'],
-    tests_require=['pytest'],
+    tests_require=[
+        "mock==2.0.0",
+        "nose==1.3.7",
+        "pytest==3.0.2",
+        "pytest-cov==2.4.0",
+    ],
 )

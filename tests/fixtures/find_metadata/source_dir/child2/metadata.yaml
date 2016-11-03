@@ -1,0 +1,4 @@
+navigation:
+    - title: "ello"
+      children:
+          - title: "A child"

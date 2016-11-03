@@ -1,0 +1,6 @@
+navigation:
+    - title: Home
+      location: index.md
+    - title: Nested
+      location: subfolder/nested.md
+
