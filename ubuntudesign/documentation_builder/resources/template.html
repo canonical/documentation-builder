@@ -49,6 +49,12 @@
         margin-right: 6px;
         margin-bottom: 1px;
       }
+      .p-navigation__link {
+        padding-top: 1px;
+      }
+      .p-navigation__link > .theme__logo {
+        margin-top: -1px;
+      }
 
       .p-toc__item {
         margin-bottom: 0.5em;
@@ -77,16 +83,9 @@
         border: 1px solid #cdcdcd;
       }
 
-      .theme__site-title {
-        font-size: 1.2rem;
-        margin-bottom: 0;
-        margin-top: 1px;
-        color: #333;
-      }
-
       .theme > .theme__header {
-        position: relative;
         padding-right: 36px;
+        display: block;
       }
 
       .theme__sidebar-toggle-button {
@@ -167,7 +166,7 @@
       <div class="p-navigation__logo">
         {% if site_root %}<a class="p-navigation__link" href="{{ site_root }}">{% endif %}
           {% if site_logo_url %}<img class="theme__logo" src="{{ site_logo_url }}" alt="{{ site_title }} logo" />{% endif %}
-          <h1 class="theme__site-title">{{ site_title if site_title else 'Documentation' }}</h1>
+          {{ site_title if site_title else 'Documentation' }}
         {% if site_root %}</a>{% endif %}
       </div>
       <nav class="p-navigation__nav">
