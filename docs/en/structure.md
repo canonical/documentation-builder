@@ -1,3 +1,7 @@
+---
+title: "How to structure documentation repositories"
+---
+
 # How to structure documentation repositories
 
 The documentation builder can work with various different file structures.

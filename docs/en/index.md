@@ -1,3 +1,7 @@
+---
+title: "Getting started with documentation-builder"
+---
+
 Getting started with documentation-builder
 ===
 
