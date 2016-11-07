@@ -1,6 +1,16 @@
 <!doctype html>
 <html lang="en">
   <head>
+    {% if tag_manager_code %}
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','{{ tag_manager_code }}');</script>
+    <!-- End Google Tag Manager -->
+    {% endif %}
+
     <meta charset="UTF-8" />
     <title>{{ site_title if site_title else 'Documentation' }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -162,6 +172,13 @@
     </style>
   </head>
   <body class="theme">
+    {% if tag_manager_code %}
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ tag_manager_code }}"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    {% endif %}
+
     <header class="theme__header p-navigation" role="banner">
       <div class="p-navigation__logo">
         {% if site_root %}<a class="p-navigation__link" href="{{ site_root }}">{% endif %}

@@ -37,6 +37,7 @@ $ documentation-builder \
     --template-path {filepath}        `# Path to an alternate wrapping template for the built HTML files`
     --site-root {root_path}           `# A URL path to the root of the site, for use in the 'home' link in the template (defaults to none)`
     --media-url {prefix}              `# Prefix for linking to media inside the built HTML files (default: Relative path to built media location, e.g.: ../media)`
+    --tag-manager-code {code}         `# If you supply a tag manager code, the default template will render Google tag manager snippets into the built HTML.`
     --force                           `# Rebuild all files (assume all files have changed).`
     --build-version-branches          `# Build each branch mentioned in the `versions` file into a subfolder`
     --no-link-extensions              `# Don't include '.html' extension in internal links`

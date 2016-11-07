@@ -62,6 +62,7 @@ class Builder():
         template_path=default_template,
         site_root=None,
         media_url=None,
+        tag_manager_code=None,
         no_link_extensions=False,
         no_cleanup=False,
         quiet=False,
@@ -149,6 +150,7 @@ class Builder():
                     path.relpath(file_directory, branch_source)
                 )
                 metadata['site_root'] = site_root
+                metadata['tag_manager_code'] = tag_manager_code
 
                 navigation = metadata.get('navigation')
 

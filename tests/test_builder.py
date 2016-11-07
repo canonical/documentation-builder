@@ -279,6 +279,43 @@ def test_media_url():
     rmtree(output)
 
 
+def test_tag_manager():
+    base = path.join(fixtures_path, 'builder', 'base')
+    output = path.join(fixtures_path, 'builder', 'output')
+    index_filepath = path.join(
+        fixtures_path, 'builder', 'output', 'en', 'index.html'
+    )
+    if path.exists(output):
+        rmtree(output)
+
+    Builder(
+        base_directory=base,
+        output_path=output,
+        tag_manager_code='GTM_654321',
+        quiet=True
+    )
+
+    with open(index_filepath) as index_file:
+        index_content = index_file.read()
+        assert 'googletagmanager.com' in index_content
+        assert 'GTM_654321' in index_content
+
+    rmtree(output)
+
+    Builder(
+        base_directory=base,
+        output_path=output,
+        quiet=True
+    )
+
+    with open(index_filepath) as index_file:
+        index_content = index_file.read()
+        assert 'googletagmanager.com' not in index_content
+        assert 'GTM_654321' not in index_content
+
+    rmtree(output)
+
+
 def _compare_trees(directory_a, directory_b):
     a_files = []
     b_files = []
