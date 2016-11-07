@@ -104,7 +104,7 @@ def parse_arguments():
     parser.add_argument(
         '--version',
         action='store_true',
-        help="Show the currently installed version"
+        help="Show the currently installed version of documentation-builder."
     )
 
     arguments = vars(parser.parse_args())
