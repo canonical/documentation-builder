@@ -1,5 +1,5 @@
 name: documentation-builder
-version: '1.0.0'
+version: '1.0.1'
 summary: Build HTML documentation from markdown
 description: |
   A tool to build repositories of markdown files of documentation into HTML pages

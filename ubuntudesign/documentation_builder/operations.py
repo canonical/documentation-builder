@@ -137,7 +137,7 @@ def find_metadata(directory_path):
     return metadata_items
 
 
-def parse_markdown(parser, template, filepath, metadata, tag_manager_code=None):
+def parse_markdown(parser, template, filepath, metadata):
     parser.reset()
     metadata = deepcopy(metadata)
 
