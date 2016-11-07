@@ -192,20 +192,24 @@ class Builder():
         if built_files:
             self._print("Built:\n- {}".format('\n- '.join(built_files)))
 
-        try:
-            if copy_media(media_path, output_media_path):
-                self._print(
-                    "Copied {} to {}".format(media_path, output_media_path)
+        if path.isdir(media_path):
+            copy_media(media_path, output_media_path)
+            self._print(
+                "Copied {} to {}".format(media_path, output_media_path)
+            )
+        else:
+            self._note(
+                "No folder found at '{}' - not copying media".format(
+                    media_path
                 )
-        except EnvironmentError as copy_error:
-            self._warn("Copying media failed: " + str(copy_error))
+            )
 
     def _print(self, message, channel=None):
         if not self.quiet:
             print(message, file=channel or self._out)
 
-    def _warn(self, message):
-        self._print("Warning: " + message, channel=self._err)
+    def _note(self, message):
+        self._print("Notice: " + message, channel=self._err)
 
     def _fail(self, message):
         self._print("Error: " + message, channel=self._err)
