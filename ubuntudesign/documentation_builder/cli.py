@@ -74,6 +74,13 @@ def parse_arguments():
         )
     )
     parser.add_argument(
+        '--tag-manager-code',
+        help=(
+            "If you supply a tag manager code, the default template will "
+            "render Google tag manager snippets into the built HTML."
+        )
+    )
+    parser.add_argument(
         '--force',
         action="store_true",
         help=("Rebuild all files (assume all files have changed)")
@@ -104,7 +111,7 @@ def parse_arguments():
     parser.add_argument(
         '--version',
         action='store_true',
-        help="Show the currently installed version"
+        help="Show the currently installed version of documentation-builder."
     )
 
     arguments = vars(parser.parse_args())

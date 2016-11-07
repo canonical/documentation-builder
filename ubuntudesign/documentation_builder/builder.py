@@ -62,6 +62,7 @@ class Builder():
         template_path=default_template,
         site_root=None,
         media_url=None,
+        tag_manager_code=None,
         no_link_extensions=False,
         no_cleanup=False,
         quiet=False,
@@ -149,6 +150,7 @@ class Builder():
                     path.relpath(file_directory, branch_source)
                 )
                 metadata['site_root'] = site_root
+                metadata['tag_manager_code'] = tag_manager_code
 
                 navigation = metadata.get('navigation')
 
@@ -190,20 +192,24 @@ class Builder():
         if built_files:
             self._print("Built:\n- {}".format('\n- '.join(built_files)))
 
-        try:
-            if copy_media(media_path, output_media_path):
-                self._print(
-                    "Copied {} to {}".format(media_path, output_media_path)
+        if path.isdir(media_path):
+            copy_media(media_path, output_media_path)
+            self._print(
+                "Copied {} to {}".format(media_path, output_media_path)
+            )
+        else:
+            self._note(
+                "No folder found at '{}' - not copying media".format(
+                    media_path
                 )
-        except EnvironmentError as copy_error:
-            self._warn("Copying media failed: " + str(copy_error))
+            )
 
     def _print(self, message, channel=None):
         if not self.quiet:
             print(message, file=channel or self._out)
 
-    def _warn(self, message):
-        self._print("Warning: " + message, channel=self._err)
+    def _note(self, message):
+        self._print("Notice: " + message, channel=self._err)
 
     def _fail(self, message):
         self._print("Error: " + message, channel=self._err)
