@@ -8,5 +8,5 @@ before_script:
 script:
   - ./setup.py test
 after_success:
-      - coveralls
+  - coveralls
 
