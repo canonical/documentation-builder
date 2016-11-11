@@ -18,11 +18,12 @@ from ubuntudesign.documentation_builder.operations import (
     find_files,
     find_metadata,
     parse_markdown,
-    prepare_branches,
+    prepare_version_branches,
     relativize_paths,
     replace_internal_links,
     replace_media_links,
     set_active_navigation_items,
+    version_paths,
     write_html
 )
 from ubuntudesign.documentation_builder.builder import markdown_extensions
@@ -329,9 +330,9 @@ def test_parse_markdown():
         assert mmdata_html == expected_metadata_html
 
 
-def test_prepare_branches():
-    repo_path = path.join(fixtures_path, 'prepare_branches', 'repo')
-    not_repo = path.join(fixtures_path, 'prepare_branches', 'not_repo')
+def test_prepare_version_branches():
+    repo_path = path.join(fixtures_path, 'prepare_version_branches', 'repo')
+    not_repo = path.join(fixtures_path, 'prepare_version_branches', 'not_repo')
 
     # Clean up repository
     if path.exists(repo_path):
@@ -353,44 +354,34 @@ def test_prepare_branches():
 
     # Error if provided an erroneous base directory
     with pytest.raises(FileNotFoundError):
-        prepare_branches("some/directory", 'output')
+        prepare_version_branches("some/directory", 'output')
 
     # Error if asked to build branches with no git repository
     with pytest.raises(GitCommandError):
-        prepare_branches(not_repo, 'output', versions=True)
+        prepare_version_branches(not_repo, 'output')
 
     repo.heads['no-versions'].checkout()
     # Error if asked to build branches with no versions file
     with pytest.raises(FileNotFoundError):
-        prepare_branches(repo_path, 'output', versions=True)
+        prepare_version_branches(repo_path, 'output')
 
     repo.heads['missing-branch'].checkout()
     # Error if asked to build branches with one of the branches missing
     with pytest.raises(GitCommandError):
-        prepare_branches(repo_path, 'output', versions=True)
-
-    # When not building versions, all existing directories should work
-    repo.heads['master'].checkout()
-    assert prepare_branches(repo_path, 'output') == [(repo_path, 'output')]
-
-    repo.heads['no-versions'].checkout()
-    assert prepare_branches(repo_path, 'output') == [(repo_path, 'output')]
-
-    repo.heads['missing-branch'].checkout()
-    assert prepare_branches(repo_path, 'output') == [(repo_path, 'output')]
-
-    assert prepare_branches(not_repo, 'output') == [(not_repo, 'output')]
+        prepare_version_branches(repo_path, 'output')
 
     # Successfully builds version branches into temp directories
     repo.heads['master'].checkout()
-    branch_paths = prepare_branches(repo_path, 'output', versions=True)
+    versions = prepare_version_branches(repo_path, 'output')
 
-    assert len(branch_paths) == 2
+    assert len(versions) == 2
 
-    for (branch_path, branch_output) in branch_paths:
-        assert path.isfile(path.join(branch_path, 'metadata.yaml')) is True
-        assert branch_path.startswith('/tmp/') is True
-        assert branch_output.startswith('output') is True
+    for version, version_info in versions.items():
+        assert path.isfile(
+            path.join(version_info['base_directory'], 'metadata.yaml')
+        ) is True
+        assert version_info['base_directory'].startswith('/tmp/') is True
+        assert version_info['output_path'].startswith('output') is True
 
     rmtree(repo_path)
 
@@ -591,6 +582,30 @@ def test_set_active_navigation_items():
     assert not navigation_items[1]['children'][0].get('active')
     assert not navigation_items[1]['children'][0]['children'][0].get('active')
     assert navigation_items[1]['children'][0]['children'][1].get('active')
+
+
+def test_version_paths():
+    function_fixtures = path.join(fixtures_path, 'version_paths')
+    version_branches = {
+        '1.8': {'base_directory': path.join(function_fixtures, '1.8')},
+        '1.9': {'base_directory': path.join(function_fixtures, '1.9')},
+        'master': {'base_directory': path.join(function_fixtures, 'master')}
+    }
+    relative_filepath = path.join('en', 'subfolder', 'index.md')
+
+    paths = version_paths(
+        version_branches=version_branches,
+        base_directory=path.join(function_fixtures, '1.9'),
+        source_folder='src',
+        relative_filepath=relative_filepath
+    )
+
+    assert paths[0] == {'name': '1.8', 'path': None}
+    assert paths[1] == {'name': '1.9', 'path': ''}
+    assert paths[2] == {
+        'name': 'master',
+        'path': '../../../master/en/subfolder/index.md'
+    }
 
 
 def test_write_html():
