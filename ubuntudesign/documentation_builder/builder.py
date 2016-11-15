@@ -121,15 +121,20 @@ class Builder():
             if built_files:
                 self._print("Built:\n- {}".format('\n- '.join(built_files)))
 
-        try:
-            if copy_media(self.media_path, self.output_media_path):
-                self._print(
-                    "Copied {} to {}".format(
-                        self.media_path, self.output_media_path
-                    )
+        if path.isdir(self.media_path):
+            copy_media(self.media_path, self.output_media_path)
+            self._print(
+                "Copied {} to {}".format(
+                    self.media_path,
+                    self.output_media_path
                 )
-        except EnvironmentError as copy_error:
-            self._warn("Copying media failed: " + str(copy_error))
+            )
+        else:
+            self._note(
+                "No folder found at '{}' - not copying media".format(
+                    self.media_path
+                )
+            )
 
     def build_branch(
         self,

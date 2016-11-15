@@ -289,11 +289,11 @@ def test_media_url():
 
 
 def test_tag_manager():
-    base = path.join(fixtures_path, 'builder', 'base')
-    output = path.join(fixtures_path, 'builder', 'output')
-    index_filepath = path.join(
-        fixtures_path, 'builder', 'output', 'en', 'index.html'
-    )
+    fixtures = path.join(fixtures_base, 'builder')
+    base = path.join(fixtures, 'base')
+    output = path.join(fixtures, 'output')
+    index_filepath = path.join(fixtures, 'output', 'en', 'index.html')
+
     if path.exists(output):
         rmtree(output)
 
