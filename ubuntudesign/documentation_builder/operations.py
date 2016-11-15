@@ -203,8 +203,14 @@ def prepare_version_branches(base_directory, output_base):
         lines = versions_file.read().splitlines()
         version_branch_names = list(filter(None, lines))
 
+    # Use tmp directory in home folder
+    home_temp = path.join(path.expanduser('~'), 'tmp')
+
+    if not path.isdir(home_temp):
+        makedirs(home_temp)
+
     for name in version_branch_names:
-        branch_base_directory = tempfile.mkdtemp()
+        branch_base_directory = tempfile.mkdtemp(dir=home_temp)
         Repo.clone_from(base_directory, branch_base_directory, branch=name)
         version_branches[name] = {
             'base_directory': branch_base_directory,
