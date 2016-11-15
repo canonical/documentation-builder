@@ -169,6 +169,22 @@
           display: block;
         }
       }
+
+      .versions__item {
+        display: inline-block;
+        margin-right: 1rem;
+      }
+
+      .theme-versions__missing {
+        color: #999;
+      }
+
+      .theme__aside nav:not(:last-of-type) {
+        margin-bottom: 1rem;
+      }
+      .theme__aside nav:not(:last-of-type) .p-toc__list {
+        border-bottom: 1px solid black;
+      }
     </style>
   </head>
   <body class="theme">
@@ -355,8 +371,27 @@
             {{ content }}
           </main>
         </div>
-        {% if toc_items %}
+        {% if toc_items or versions %}
         <aside class="col-2 theme__aside">
+          {% if versions %}
+          <nav class="p-toc">
+            <h4 class="p-toc__header">Versions</h4>
+            <ul class="p-toc__list">
+              {% for version in versions %}
+                <li class="p-toc__item versions__item">
+                  {% if version.path is none %}
+                  <span class="theme-versions__missing">{{ version.name }}</span>
+                  {% elif version.path == '' %}
+                  <span class="theme-versions__current">{{ version.name }}</span>
+                  {% else %}
+                  <a href="{{ version.path }}" class="theme-versions__link">{{ version.name }}</a>
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          </nav>
+          {% endif %}
+          {% if toc_items %}
           <div class="p-toc">
             <h4 class="p-toc__header">Contents</h4>
             <nav>
@@ -366,6 +401,7 @@
               </ul>
             </nav>
           </div>
+          {% endif %}
         </aside>
         {% endif %}
       </div>
