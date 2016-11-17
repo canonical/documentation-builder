@@ -211,6 +211,15 @@ def prepare_version_branches(base_directory, output_base):
 
     for name in version_branch_names:
         branch_base_directory = tempfile.mkdtemp(dir=home_temp)
+
+        # Make sure remote branches are created locally before cloning
+        base_repo = Repo(base_directory)
+        if name not in [branch.name for branch in base_repo.branches]:
+            for remote in base_repo.remotes:
+                for ref in remote.refs:
+                    if ref.name.endswith('/' + name):
+                        base_repo.create_head(name, ref.name)
+
         Repo.clone_from(base_directory, branch_base_directory, branch=name)
         version_branches[name] = {
             'base_directory': branch_base_directory,
