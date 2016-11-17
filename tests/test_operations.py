@@ -8,7 +8,7 @@ import yaml
 import markdown
 import pytest
 from git import Repo
-from git.exc import GitCommandError
+from git.exc import GitCommandError, InvalidGitRepositoryError
 from jinja2 import Template
 
 # Local modules
@@ -357,7 +357,7 @@ def test_prepare_version_branches():
         prepare_version_branches("some/directory", 'output')
 
     # Error if asked to build branches with no git repository
-    with pytest.raises(GitCommandError):
+    with pytest.raises(InvalidGitRepositoryError):
         prepare_version_branches(not_repo, 'output')
 
     repo.heads['no-versions'].checkout()
