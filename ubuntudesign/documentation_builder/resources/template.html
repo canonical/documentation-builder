@@ -392,7 +392,7 @@
           </nav>
           {% endif %}
           {% if toc_items %}
-          <div class="p-toc">
+          <div id="table-of-contents" class="p-toc">
             <h4 class="p-toc__header">Contents</h4>
             <nav>
               <ul class="p-toc__list">
@@ -423,14 +423,15 @@
       });
 
       /* Setup sticky table of contents */
-      var toc = document.querySelector('.p-toc');
+      var toc = document.querySelector('#table-of-contents');
+      var tocOffset = toc.offsetTop + 20
       if (toc) {
         window.addEventListener(
           'scroll',
           function(scrollEvent) {
             toc.classList.toggle(
               'fixed',
-              window.innerWidth >= 768 && window.scrollY > 50
+              window.innerWidth >= 768 && window.scrollY > tocOffset
             );
           }
         );
