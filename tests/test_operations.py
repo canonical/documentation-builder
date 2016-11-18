@@ -380,7 +380,7 @@ def test_prepare_version_branches():
         assert path.isfile(
             path.join(version_info['base_directory'], 'metadata.yaml')
         ) is True
-        assert 'tmp/' in version_info['base_directory']
+        assert '.cache/' in version_info['base_directory']
         assert version_info['output_path'].startswith('output')
 
     rmtree(repo_path)

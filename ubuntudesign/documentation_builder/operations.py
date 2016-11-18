@@ -203,14 +203,17 @@ def prepare_version_branches(base_directory, output_base):
         lines = versions_file.read().splitlines()
         version_branch_names = list(filter(None, lines))
 
-    # Use tmp directory in home folder
-    home_temp = path.join(path.expanduser('~'), 'tmp')
+    cache_dir = path.join(
+        path.expanduser('~'),
+        '.cache',
+        'documentation-builder'
+    )
 
-    if not path.isdir(home_temp):
-        makedirs(home_temp)
+    if not path.isdir(cache_dir):
+        makedirs(cache_dir)
 
     for name in version_branch_names:
-        branch_base_directory = tempfile.mkdtemp(dir=home_temp)
+        branch_base_directory = tempfile.mkdtemp(dir=cache_dir)
 
         # Make sure remote branches are created locally before cloning
         base_repo = Repo(base_directory)
