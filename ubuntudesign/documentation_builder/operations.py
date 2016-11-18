@@ -16,6 +16,7 @@ from yaml.parser import ParserError
 
 # Local modules
 from .utilities import (
+    cache_dir,
     matching_metadata,
     mergetree,
     relativize,
@@ -190,38 +191,39 @@ def parse_markdown(parser, template, filepath, metadata):
     return template.render(metadata)
 
 
-def prepare_branches(base_directory, output_base, versions=False):
+def prepare_version_branches(base_directory, output_base):
     """
     If build_version_branches is true, look for a "versions" file in the
     base_directory and then pull each version branch.
     Otherwise, just return the base directory.
     """
 
-    branch_paths = []
+    version_branches = {}
 
-    if not path.isdir(base_directory):
-        raise FileNotFoundError(
-            'Base directory not found: {}'.format(base_directory)
-        )
+    with open(path.join(base_directory, 'versions')) as versions_file:
+        lines = versions_file.read().splitlines()
+        version_branch_names = list(filter(None, lines))
 
-    if versions:
-        with open(path.join(base_directory, 'versions')) as versions_file:
-            lines = versions_file.read().splitlines()
-            version_branches = list(filter(None, lines))
+    builder_cache = cache_dir('documentation-builder')
 
-        for branch in version_branches:
-            branch_output = path.join(output_base, branch)
-            branch_dir = tempfile.mkdtemp()
-            Repo.clone_from(base_directory, branch_dir, branch=branch)
-            branch_paths.append(
-                (branch_dir, branch_output)
-            )
-    else:
-        branch_paths.append(
-            (base_directory, output_base)
-        )
+    for name in version_branch_names:
+        branch_base_directory = tempfile.mkdtemp(dir=builder_cache)
 
-    return branch_paths
+        # Make sure remote branches are created locally before cloning
+        base_repo = Repo(base_directory)
+        if name not in [branch.name for branch in base_repo.branches]:
+            for remote in base_repo.remotes:
+                for ref in remote.refs:
+                    if ref.name.endswith('/' + name):
+                        base_repo.create_head(name, ref.name)
+
+        Repo.clone_from(base_directory, branch_base_directory, branch=name)
+        version_branches[name] = {
+            'base_directory': branch_base_directory,
+            'output_path': path.join(output_base, name)
+        }
+
+    return version_branches
 
 
 def relativize_paths(item, original_base_path, new_base_path):
@@ -260,6 +262,12 @@ def relativize_paths(item, original_base_path, new_base_path):
 
 
 def replace_internal_links(html, extensions=True):
+    """
+    Replace internal links to .md files
+    with .html extensions (if extensios is default of True)
+    or no extension otherwise
+    """
+
     internal_link_match = re.compile(
         r'(?:(?<=src=["\'])|(?<=href=["\']))'
         r'((?:[^ "\'/]|(?<![/"\'])/)+)\.md\b'
@@ -337,6 +345,47 @@ def set_active_navigation_items(filename, items, parents=[]):
                 break
 
     return active_items
+
+
+def version_paths(
+    version_branches,
+    base_directory,
+    source_folder,
+    relative_filepath
+):
+    """
+    Find the paths to versions of a file in other version branches.
+
+    Returns a dictionary mapping versions to filepaths.
+    If the file doesn't exist, the filepath will be None
+    """
+
+    version_filepaths = []
+
+    for name, info in sorted(version_branches.items()):
+        version_relative_filepath = path.relpath(
+            path.join('..', name, relative_filepath),
+            path.dirname(relative_filepath)
+        )
+        version_filepath = path.join(
+            info['base_directory'],
+            source_folder,
+            relative_filepath
+        )
+
+        if info['base_directory'] == base_directory:
+            version_filepath = ''
+        elif path.isfile(version_filepath):
+            version_filepath = version_relative_filepath
+        else:
+            version_filepath = None
+
+        version_filepaths.append({
+            'name': name,
+            'path': version_filepath
+        })
+
+    return version_filepaths
 
 
 def write_html(html, output_filepath):

@@ -1,6 +1,6 @@
 # Core modules
 import re
-from os import listdir, makedirs, path, stat
+from os import environ, listdir, makedirs, path, stat
 from shutil import copy2
 
 
@@ -71,3 +71,21 @@ def sort_paths(item):
     """
 
     return path.normpath(item[0])
+
+
+def cache_dir(name):
+    """
+    Return the path to a named user cache directory (e.g. ~/.cache/name).
+    Create the directory if it doesn't exist
+    """
+
+    cache_dir = environ.get(
+        'XDG_CACHE_HOME',
+        path.join(path.expanduser('~'), '.cache')
+    )
+    named_cache = path.join(cache_dir, name)
+
+    if not path.isdir(named_cache):
+        makedirs(named_cache)
+
+    return named_cache

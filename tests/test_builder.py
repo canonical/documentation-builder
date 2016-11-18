@@ -22,12 +22,22 @@ from pytest import raises
 from ubuntudesign.documentation_builder.builder import Builder
 
 
-fixtures_path = path.join(path.dirname(__file__), 'fixtures')
+fixtures_base = path.join(path.dirname(__file__), 'fixtures')
+
+
+def test_missing_base():
+    # Build normally
+    with raises(FileNotFoundError):
+        Builder(
+            base_directory='/a/non/existent/base',
+            output_path='doesnt/matter',
+            quiet=True
+        )
 
 
 def test_no_metadata():
-    base = path.join(fixtures_path, 'builder', 'no-metadata')
-    output = path.join(fixtures_path, 'builder', 'output')
+    base = path.join(fixtures_base, 'builder', 'no-metadata')
+    output = path.join(fixtures_base, 'builder', 'output')
 
     if path.exists(output):
         rmtree(output)
@@ -43,7 +53,7 @@ def test_no_metadata():
 
 
 def test_quiet():
-    fixtures = path.join(fixtures_path, 'builder')
+    fixtures = path.join(fixtures_base, 'builder')
     base = path.join(fixtures, 'base')
     output = path.join(fixtures, 'output')
 
@@ -81,7 +91,7 @@ def test_quiet():
 
 
 def test_basic_build():
-    fixtures = path.join(fixtures_path, 'builder')
+    fixtures = path.join(fixtures_base, 'builder')
     base = path.join(fixtures, 'base')
     output = path.join(fixtures, 'output')
     index = path.join(fixtures, 'output', 'en', 'index.html')
@@ -128,7 +138,7 @@ def test_basic_build():
 
 
 def test_no_media():
-    fixtures = path.join(fixtures_path, 'builder')
+    fixtures = path.join(fixtures_base, 'builder')
     base = path.join(fixtures, 'base-no-media')
     output = path.join(fixtures, 'output')
     expected_output = path.join(fixtures, 'output_no_media')
@@ -149,11 +159,11 @@ def test_no_media():
 
 
 def test_custom_template():
-    base = path.join(fixtures_path, 'builder', 'base')
-    output = path.join(fixtures_path, 'builder', 'output')
-    template_path = path.join(fixtures_path, 'builder', 'template.jinja2')
+    base = path.join(fixtures_base, 'builder', 'base')
+    output = path.join(fixtures_base, 'builder', 'output')
+    template_path = path.join(fixtures_base, 'builder', 'template.jinja2')
     expected_output = path.join(
-        fixtures_path, 'builder', 'output_custom_template'
+        fixtures_base, 'builder', 'output_custom_template'
     )
     if path.exists(output):
         rmtree(output)
@@ -172,10 +182,10 @@ def test_custom_template():
 
 
 def test_source_folder():
-    base = path.join(fixtures_path, 'builder', 'base-source-folder')
-    output = path.join(fixtures_path, 'builder', 'output')
+    base = path.join(fixtures_base, 'builder', 'base-source-folder')
+    output = path.join(fixtures_base, 'builder', 'output')
     expected_output = path.join(
-        fixtures_path, 'builder', 'output_basic'
+        fixtures_base, 'builder', 'output_basic'
     )
     if path.exists(output):
         rmtree(output)
@@ -194,11 +204,10 @@ def test_source_folder():
 
 
 def test_versions():
-    base = path.join(fixtures_path, 'builder', 'base-repo')
-    output = path.join(fixtures_path, 'builder', 'output')
-    expected_output = path.join(
-        fixtures_path, 'builder', 'output_versions'
-    )
+    fixtures = path.join(fixtures_base, 'builder')
+    base = path.join(fixtures, 'base-repo')
+    output = path.join(fixtures, 'output')
+    expected_output = path.join(fixtures, 'output_versions')
 
     # make sure things don't exist
     if path.exists(output):
@@ -233,13 +242,13 @@ def test_versions():
 
 
 def test_output_media_path():
-    base = path.join(fixtures_path, 'builder', 'base')
-    output = path.join(fixtures_path, 'builder', 'output')
+    base = path.join(fixtures_base, 'builder', 'base')
+    output = path.join(fixtures_base, 'builder', 'output')
     output_media_path = path.join(
-        fixtures_path, 'builder', 'output', 'files', 'media'
+        fixtures_base, 'builder', 'output', 'files', 'media'
     )
     expected_output = path.join(
-        fixtures_path, 'builder', 'output_media_path'
+        fixtures_base, 'builder', 'output_media_path'
     )
     if path.exists(output):
         rmtree(output)
@@ -258,10 +267,10 @@ def test_output_media_path():
 
 
 def test_media_url():
-    base = path.join(fixtures_path, 'builder', 'base')
-    output = path.join(fixtures_path, 'builder', 'output')
+    base = path.join(fixtures_base, 'builder', 'base')
+    output = path.join(fixtures_base, 'builder', 'output')
     expected_output = path.join(
-        fixtures_path, 'builder', 'output_media_url'
+        fixtures_base, 'builder', 'output_media_url'
     )
     if path.exists(output):
         rmtree(output)
@@ -280,11 +289,11 @@ def test_media_url():
 
 
 def test_tag_manager():
-    base = path.join(fixtures_path, 'builder', 'base')
-    output = path.join(fixtures_path, 'builder', 'output')
-    index_filepath = path.join(
-        fixtures_path, 'builder', 'output', 'en', 'index.html'
-    )
+    fixtures = path.join(fixtures_base, 'builder')
+    base = path.join(fixtures, 'base')
+    output = path.join(fixtures, 'output')
+    index_filepath = path.join(fixtures, 'output', 'en', 'index.html')
+
     if path.exists(output):
         rmtree(output)
 
@@ -355,6 +364,7 @@ def _compare_html_parts(directory_a, directory_b):
 
         for index, a_link in enumerate(a_links):
             b_link = b_links[index]
+
             assert a_link['href'] == b_link['href']
             assert a_link.contents == b_link.contents
 
