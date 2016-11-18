@@ -16,6 +16,7 @@ from yaml.parser import ParserError
 
 # Local modules
 from .utilities import (
+    cache_dir,
     matching_metadata,
     mergetree,
     relativize,
@@ -203,17 +204,10 @@ def prepare_version_branches(base_directory, output_base):
         lines = versions_file.read().splitlines()
         version_branch_names = list(filter(None, lines))
 
-    cache_dir = path.join(
-        path.expanduser('~'),
-        '.cache',
-        'documentation-builder'
-    )
-
-    if not path.isdir(cache_dir):
-        makedirs(cache_dir)
+    builder_cache = cache_dir('documentation-builder')
 
     for name in version_branch_names:
-        branch_base_directory = tempfile.mkdtemp(dir=cache_dir)
+        branch_base_directory = tempfile.mkdtemp(dir=builder_cache)
 
         # Make sure remote branches are created locally before cloning
         base_repo = Repo(base_directory)

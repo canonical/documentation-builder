@@ -27,6 +27,7 @@ from ubuntudesign.documentation_builder.operations import (
     write_html
 )
 from ubuntudesign.documentation_builder.builder import markdown_extensions
+from ubuntudesign.documentation_builder.utilities import cache_dir
 
 
 example_dictionary = {
@@ -376,11 +377,13 @@ def test_prepare_version_branches():
 
     assert len(versions) == 2
 
+    builder_cache = cache_dir('documentation-builder')
+
     for version, version_info in versions.items():
         assert path.isfile(
             path.join(version_info['base_directory'], 'metadata.yaml')
         ) is True
-        assert '.cache/' in version_info['base_directory']
+        assert builder_cache in version_info['base_directory']
         assert version_info['output_path'].startswith('output')
 
     rmtree(repo_path)
