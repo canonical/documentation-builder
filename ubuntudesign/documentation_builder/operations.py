@@ -184,6 +184,9 @@ def parse_markdown(parser, template, filepath, metadata):
 
             item['class'] = 'p-toc__item'
 
+            for anchor in item('a'):
+                anchor['class'] = 'p-toc__link'
+
             nav_item_strings.append(str(item))
 
         metadata['toc_items'] = "\n".join(nav_item_strings)
