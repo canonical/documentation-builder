@@ -11,6 +11,7 @@ from markdown.extensions.fenced_code import FencedCodeExtension
 from markdown.extensions.meta import MetaExtension
 from markdown.extensions.tables import TableExtension
 from markdown.extensions.toc import TocExtension
+from markdown.extensions.codehilite import CodeHiliteExtension
 from mdx_callouts import makeExtension as CalloutsExtension
 from mdx_anchors_away import AnchorsAwayExtension
 from mdx_foldouts import makeExtension as FoldoutsExtension
@@ -45,6 +46,7 @@ markdown_extensions = [
     AttrListExtension(),
     TocExtension(marker='', baselevel=1),
     CalloutsExtension(),
+    CodeHiliteExtension(),
     AnchorsAwayExtension(),
     FoldoutsExtension()
 ]
