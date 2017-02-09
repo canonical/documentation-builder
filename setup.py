@@ -13,7 +13,7 @@ assert sys.version_info >= (3, 5), (
 
 setup(
     name='ubuntudesign.documentation-builder',
-    version='1.1.0',
+    version='1.2.0',
     author='Canonical webteam',
     author_email='robin+pypi@canonical.com',
     url='https://github.com/ubuntudesign/documentation-builder',
@@ -37,6 +37,7 @@ setup(
         "mdx-callouts==1.0.0",
         "mdx-foldouts==1.0.0",
         "python-frontmatter==0.2.1",
+        "pygments==2.2.0",
         "PyYAML==3.12",
         "beautifulsoup4==4.5.1",
     ],

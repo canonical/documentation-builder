@@ -7,7 +7,7 @@ import pkg_resources
 from .builder import Builder
 
 
-def parse_arguments():
+def parse_arguments(arguments):
     """
     Parse command-line options for documentation-parser command-line script
     """
@@ -114,7 +114,7 @@ def parse_arguments():
         help="Show the currently installed version of documentation-builder."
     )
 
-    arguments = vars(parser.parse_args())
+    arguments = vars(parser.parse_args(arguments))
 
     if arguments['version']:
         print(
@@ -130,15 +130,15 @@ def parse_arguments():
     return {name: value for name, value in arguments.items() if value}
 
 
-def main():
+def main(system_arguments):
     """
     The starting point for the documentation-parser.
     Intended to be run through the command-line.
     """
 
-    arguments = parse_arguments()
+    arguments = parse_arguments(system_arguments)
     Builder(**arguments)
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
