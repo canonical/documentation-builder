@@ -1,0 +1,3 @@
+v1.2.0, 2017-02-09 -- Add syntax highlighting
+v1.2.1, 2017-02-10 -- Bugfix: Fix styling to prevent checkbox showing where it should't
+
