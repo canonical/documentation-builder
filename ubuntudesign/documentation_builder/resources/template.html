@@ -187,6 +187,19 @@
         {% if site_root %}</a>{% endif %}
       </div>
       <label for="nav-toggle-checkbox" class="theme__sidebar-toggle-button">Menu</label>
+
+      {% if search_url %}
+        <form id="search" action="{{ search_url }}" class="search">
+          <label for="edit-keys" class="header-search__label">Search</label>
+          <input class="search__field" type="search" name="q" id="search" placeholder="{{ search_placeholder }}" />
+          {% for domain in search_domains %}
+            <input type="hidden" name="domain" value="{{ domain }}" />
+          {% endfor %}
+          <button type="submit" class="search__button">
+            <img src="https://assets.ubuntu.com/v1/19750a6d-search-black.svg" class="search__icon" alt="Perform a search">
+          </button>
+        </form>
+      {% endif %}
     </header>
     <div class="row">
       <div class="p-layout__wrap">
@@ -450,4 +463,3 @@
     </script>
   </body>
 </html>
-
