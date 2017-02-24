@@ -94,6 +94,30 @@ def parse_arguments(arguments):
         )
     )
     parser.add_argument(
+        '--search-url',
+        help=(
+            "The URL endpoint for performing searches from the header. "
+            "The header search field will only be included if this is "
+            "provided."
+        )
+    )
+    parser.add_argument(
+        '--search-placeholder',
+        help=(
+            "Placeholder text for including in the header search field. "
+            "Default: 'Search documentation'."
+        )
+    )
+    parser.add_argument(
+        '--search-domain',
+        dest='search_domains',
+        action='append',
+        help=(
+            "Pass this 'domain' query parameter along with the search "
+            "string when performing searches."
+        )
+    )
+    parser.add_argument(
         '--no-link-extensions',
         action='store_true',
         help="Don't include '.html' extension in internal links"

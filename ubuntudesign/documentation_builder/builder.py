@@ -63,6 +63,9 @@ class Builder():
         force=False,
         build_version_branches=False,
         template_path=default_template,
+        search_url=None,
+        search_placeholder='Search documentation',
+        search_domains=[],
         site_root=None,
         media_url=None,
         tag_manager_code=None,
@@ -83,6 +86,9 @@ class Builder():
         self.base_directory = base_directory
         self.media_url = media_url
         self.tag_manager_code = tag_manager_code
+        self.search_url = search_url
+        self.search_placeholder = search_placeholder
+        self.search_domains = search_domains
         self.no_link_extensions = no_link_extensions
         self.parser = markdown.Markdown(extensions=markdown_extensions)
         with open(template_path, encoding="utf-8") as template_file:
@@ -207,6 +213,9 @@ class Builder():
             )
             metadata['site_root'] = self.site_root
             metadata['tag_manager_code'] = self.tag_manager_code
+            metadata['search_url'] = self.search_url
+            metadata['search_placeholder'] = self.search_placeholder
+            metadata['search_domains'] = self.search_domains
 
             navigation = metadata.get('navigation')
 

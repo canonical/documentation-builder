@@ -266,6 +266,44 @@ def test_output_media_path():
     rmtree(output)
 
 
+def test_search():
+    base = path.join(fixtures_base, 'builder', 'base')
+    output = path.join(fixtures_base, 'builder', 'output')
+    expected_output = path.join(
+        fixtures_base, 'builder', 'output_search'
+    )
+    if path.exists(output):
+        rmtree(output)
+
+    Builder(
+        base_directory=base,
+        output_path=output,
+        search_url='https://example.com/search',
+        search_placeholder='Placeholder text',
+        search_domains=['one.example.com', 'two.example.com/path'],
+        quiet=True
+    )
+
+    # Check the output file structure is as expected
+    _compare_trees(output, expected_output)
+
+    # Compare search HTML
+    output_index = path.join(output, 'en/index.html')
+    expected_index = path.join(expected_output, 'en/index.html')
+
+    with open(output_index, encoding="utf-8") as output_file:
+        output_soup = BeautifulSoup(output_file.read(), 'html.parser')
+    with open(expected_index, encoding="utf-8") as expected_file:
+        expected_soup = BeautifulSoup(expected_file.read(), 'html.parser')
+
+    output_search = output_soup.select('form#search')[0]
+    expected_search = expected_soup.select('form#search')[0]
+
+    assert output_search == expected_search
+
+    rmtree(output)
+
+
 def test_media_url():
     base = path.join(fixtures_base, 'builder', 'base')
     output = path.join(fixtures_base, 'builder', 'output')
