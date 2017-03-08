@@ -2,3 +2,4 @@ v1.2.0, 2017-02-09 -- Add syntax highlighting
 v1.2.1, 2017-02-10 -- Bugfix: Fix styling to prevent checkbox showing where it should't
 v1.2.2, 2017-02-21 -- Upgrade to vanilla-docs-theme 1.3.3 in the default template
 v1.3.0, 2017-02-22 -- Add search form to template, enabled with "--search-url"
+v1.3.1, 2017-02-22 -- Include page title in <title> in the default template
