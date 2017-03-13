@@ -15,3 +15,4 @@ tests/fixtures/prepare_branches/repo/
 tests/fixtures/builder/base-repo/
 .coverage
 htmlcov/
+env*/
