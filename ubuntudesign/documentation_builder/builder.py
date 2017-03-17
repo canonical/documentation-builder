@@ -13,7 +13,6 @@ from markdown.extensions.tables import TableExtension
 from markdown.extensions.toc import TocExtension
 from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.extensions.admonition import AdmonitionExtension
-#from mdx_callouts import makeExtension as CalloutsExtension
 from mdx_anchors_away import AnchorsAwayExtension
 from mdx_foldouts import makeExtension as FoldoutsExtension
 
