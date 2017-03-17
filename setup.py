@@ -34,7 +34,6 @@ setup(
         "Jinja2==2.8",
         "Markdown==2.6.6",
         "mdx-anchors-away==1.0.1",
-        "mdx-callouts==1.0.0",
         "mdx-foldouts==1.0.0",
         "python-frontmatter==0.2.1",
         "pygments==2.2.0",
