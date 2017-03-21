@@ -13,3 +13,13 @@ An introduction.
 - [missing page](missing.md)
 - [external page](https://example.com/index.md)
 
+## Notifications
+
+!!! Note:
+    Things are reasonable
+
+!!! Warning "":
+    I have no title
+
+!!! Positive "Awesome":
+    Everything is now wonderful
