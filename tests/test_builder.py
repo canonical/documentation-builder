@@ -8,6 +8,7 @@ function of the builder.
 """
 
 # Core modules
+import re
 from glob import glob
 from os import path, utime
 from shutil import rmtree
@@ -414,3 +415,17 @@ def _compare_html_parts(directory_a, directory_b):
             b_img = b_imgs[index]
             assert a_img['src'] == b_img['src']
             assert a_img['alt'] == b_img['alt']
+
+        # Compare notifications
+        a_notifications = a_soup.findAll(
+            "div", {"class" : re.compile('p-notification.*')}
+        )
+        b_notifications = b_soup.findAll(
+            "div", {"class" : re.compile('p-notification.*')}
+        )
+
+        for index, a_notification in enumerate(a_notifications):
+            b_notification = b_notifications[index]
+            a_stripped = str(a_notification).replace(' ', '').replace("\n", '')
+            b_stripped = str(b_notification).replace(' ', '').replace("\n", '')
+            assert a_stripped == b_stripped
