@@ -105,56 +105,79 @@
       .search__label {
         display: none;
       }
+
       .search--header {
-        margin: 0;
-        float: right;
-        margin-left: auto;
-        margin-right: 7.5px;
+        float: none;
+        margin: 10px;
       }
+
+      @media (min-width: 768px) {
+        .search--header {
+          float: right;
+          margin: 0 7.5px 0 auto;
+        }
+      }
+
       .search__field,
       .search__field[type='search'] {
-        max-width: 480px;
-        padding: 6px 38px 6px 10px;
-        float: left;
-        margin-right: -38px;
+        background-color: transparent;
         border-color: #cdcdcd;
         display: block;
-        background-color: transparent;
+        float: left;
         line-height: 24px;
         margin-bottom: 0;
+        margin-right: -38px;
+        padding: 6px 38px 6px 10px;
       }
+
       .search--header .search__field {
-        width: 250px;
+        clear: both;
+        width: 100%;
       }
+
+      @media (min-width: 768px) {
+        .search--header .search__field {
+          clear: none;
+          width: 250px;
+        }
+      }
+
       @media (max-width: 767px) {
         .search__button {
+          clear: right;
           width: auto;
         }
       }
+
       .search__button,
       .search__button:focus,
       .search__button:active {
+        background-color: transparent;
         border: none;
         display: block;
-        padding: 6px;
-        margin: 0;
-        vertical-align: middle;
-        background-color: transparent;
         line-height: 0;
+        margin: 0;
+        padding: 6px;
+        vertical-align: middle;
       }
+
       .search__button:hover {
         background-color: transparent;
         border: none;
       }
+
       .search__svg-frame {
         stroke: #888
       }
+
       .search__button:hover .search__svg-frame {
         stroke: #111;
       }
+
       .search__svg-handle {
         fill: #888;
       }
+
       .search__button:hover .search__svg-handle {
         fill: #111;
       }
@@ -163,10 +186,10 @@
        * Make the aside section fixed to the top
        */
       .p-aside.fixed {
-        position: fixed;
-        top: 0;
-        right: 0;
         margin-top: 0;
+        position: fixed;
+        right: 0;
+        top: 0;
        }
 
       /**
@@ -194,6 +217,9 @@
        */
       .theme__sidebar-toggle-button {
         display: block;
+        float: right;
+        margin-bottom: 10px;
+        margin-right: 20px;
       }
 
       .theme__sidebar-toggle {
@@ -210,17 +236,17 @@
 
       @media (min-width: 768px) {
         .theme__sidebar-toggle-button {
-          display: none;
-          position: absolute;
-          top: 6px;
-          right: 6px;
-          cursor: pointer;
-          text-indent: -1000px;
           background-image: url('https://assets.ubuntu.com/v1/39a96c62-navigation-menu-black.svg');
-          width: 38px;
-          height: 32px;
-          background-repeat: no-repeat;
           background-position: center center;
+          background-repeat: no-repeat;
+          cursor: pointer;
+          display: none;
+          height: 32px;
+          position: absolute;
+          right: 6px;
+          text-indent: -1000px;
+          top: 6px;
+          width: 38px;
         }
 
         .p-sidebar-nav {
