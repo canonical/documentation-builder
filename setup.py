@@ -13,7 +13,7 @@ assert sys.version_info >= (3, 5), (
 
 setup(
     name='ubuntudesign.documentation-builder',
-    version='1.4.1',
+    version='1.4.3',
     author='Canonical webteam',
     author_email='robin+pypi@canonical.com',
     url='https://github.com/ubuntudesign/documentation-builder',
@@ -39,6 +39,7 @@ setup(
         "pygments==2.2.0",
         "PyYAML==3.12",
         "beautifulsoup4==4.5.1",
+        "markdown_urlize==0.2.0",
     ],
     setup_requires=['pytest-runner'],
     tests_require=[
