@@ -48,4 +48,5 @@ setup(
         "pytest==3.0.2",
         "pytest-cov==2.4.0",
     ],
+    scripts=['documentation-builder']
 )
