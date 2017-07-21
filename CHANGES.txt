@@ -6,3 +6,4 @@ v1.3.1, 2017-02-22 -- Include page title in <title> in the default template
 v1.4.0, 2017-03-21 -- Support for notifications in documents
 v1.4.2, 2017-03-30 -- Add urlize to convert text links to anchor links
 v1.4.3, 2017-03-30 -- Use the site_logo as a favicon; Styling improvement for wrapping in navigation
+v1.5.0, 2017-07-21 -- Include the binary in the pip3 package
