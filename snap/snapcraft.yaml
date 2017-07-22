@@ -1,5 +1,5 @@
 name: documentation-builder
-version: '1.4.3'
+version: '1.5.0'
 summary: Build HTML documentation from markdown
 description: |
   A tool to build repositories of markdown files of documentation into HTML pages
@@ -13,7 +13,7 @@ parts:
     source: .
   copy:
     plugin: dump
-    source: bin
+    source: .
   git:
     plugin: autotools
     source: https://github.com/git/git/archive/v2.10.2.tar.gz
