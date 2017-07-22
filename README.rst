@@ -16,11 +16,11 @@ remote git repository containing markdown files.
 Installation
 ------------
 
-The best way to install `documentation-builder` is with [`snap`](https://snapcraft.io):
+The best way to install `documentation-builder` is with `snap <https://snapcraft.io>`__:
 
 .. code:: bash
 
-    snap install documentation-builder
+    sudo snap install documentation-builder
 
 If you don't have `snap`  on your system, you can also install it with `pip3`:
 
@@ -70,3 +70,4 @@ To run tests:
 .. code:: bash
 
     ./setup.py test
+
