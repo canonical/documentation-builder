@@ -256,7 +256,7 @@
                     {% if item.children %}
                     <h4 class="p-sidebar-nav__header {% if item.active %}is-active{% endif %}"><a href="{{ item.location }}">{{ item.title }}</a></h4>
                     {% else %}
-                    <a class="p-sidebar-nav__link {% if item.active %}is-active{% endif %}" href="{{ item.location }}">{{ item.title }}</a>
+                    <a class="p-sidebar-nav__link {% if item.external %}p-link--external {% endif %}{% if item.active %}is-active{% endif %}" href="{{ item.location }}">{{ item.title }}</a>
                     {% endif %}
                 {% else %}
                 <h4 class="p-sidebar-nav__header">{{ item.title }}</h4>
@@ -268,7 +268,7 @@
                     {% for child in item.children %}
                     <li>
                       {% if child.location %}
-                      <a class="p-sidebar-nav__link {% if child.active %}is-active{% endif %}" href="{{ child.location }}">
+                      <a class="p-sidebar-nav__link {% if child.external %}p-link--external {% endif %}{% if child.active %}is-active{% endif %}" href="{{ child.location }}">
                         {{ child.title }}
                       </a>
                       {% else %}
@@ -281,7 +281,7 @@
                           {% for grandchild in child.children %}
                           <li>
                             {% if grandchild.location %}
-                            <a class="p-sidebar-nav__link {% if grandchild.active %}is-active{% endif %}" href="{{ grandchild.location }}">
+                            <a class="p-sidebar-nav__link {% if grandchild.external %}p-link--external {% endif %}{% if grandchild.active %}is-active{% endif %}" href="{{ grandchild.location }}">
                               {{ grandchild.title }}
                             </a>
                             {% else %}
