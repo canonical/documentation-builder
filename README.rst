@@ -47,7 +47,7 @@ To check your changes to documentation-builder, it's probably easiest to install
     python3 -m venv env3 && source env3/bin/activate  # Create encapsulated environment
     pip install -e .  # Install the module in editable mode
 
-    bin/documentation-builder --source-folder docs  # build the documentation-builder's own documentation
+    documentation-builder --source-folder docs  # build the documentation-builder's own documentation
     xdg-open build/en/index.html  # Open up the documentation page
 
 Watching for changes
