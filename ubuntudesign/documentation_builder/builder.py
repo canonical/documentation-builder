@@ -12,7 +12,6 @@ from markdown.extensions.meta import MetaExtension
 from markdown.extensions.tables import TableExtension
 from markdown.extensions.toc import TocExtension
 from markdown.extensions.codehilite import CodeHiliteExtension
-from mdx_urlize import UrlizeExtension
 from mdx_anchors_away import AnchorsAwayExtension
 from mdx_foldouts import makeExtension as FoldoutsExtension
 
@@ -50,7 +49,6 @@ markdown_extensions = [
     CodeHiliteExtension(),
     AnchorsAwayExtension(),
     FoldoutsExtension(),
-    UrlizeExtension(),
 ]
 
 
