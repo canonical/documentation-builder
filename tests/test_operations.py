@@ -236,11 +236,11 @@ def test_find_files():
     uppercase_files = files[3]
 
     assert new_files == [paths['new_file']]
-    assert modified_files == [
+    assert sorted(modified_files) == sorted([
         paths['unchanged_md'],
+        paths['unchanged_sub_md'],
         paths['modified_md'],
-        paths['unchanged_sub_md']
-    ]
+    ])
     assert unmodified_files == []
     assert uppercase_files == [paths['readme']]
 
@@ -257,10 +257,10 @@ def test_find_files():
     uppercase_files = files[3]
 
     assert new_files == [paths['new_file']]
-    assert modified_files == [
+    assert sorted(modified_files) == sorted([
+        path.join(source_dir, 'subdir', 'unchanged.md'),
         path.join(source_dir, 'subdir', 'modified_file.md'),
-        path.join(source_dir, 'subdir', 'unchanged.md')
-    ]
+    ])
     assert unmodified_files == [paths['unchanged_md']]
     assert uppercase_files == [paths['readme']]
 

@@ -171,25 +171,23 @@ def parse_markdown(parser, template, filepath, metadata):
 
         metadata.update(markdown_meta)
 
-    if metadata.get('table_of_contents'):
-        toc_soup = BeautifulSoup(parser.toc, 'html.parser')
+    toc_soup = BeautifulSoup(parser.toc, 'html.parser')
 
-        # Get title list item (<h1>)
-        nav_item_strings = []
+    nav_item_strings = []
 
-        # Only get <h2> items, to avoid getting crazy
-        for item in toc_soup.select('.toc > ul > li > ul > li'):
-            for child in item('ul'):
-                child.extract()
+    # Only get <h2> items, to avoid getting crazy
+    for item in toc_soup.select('.toc > ul > li > ul > li'):
+        for child in item('ul'):
+            child.extract()
 
-            item['class'] = 'p-toc__item'
+        item['class'] = 'p-toc__item'
 
-            for anchor in item('a'):
-                anchor['class'] = 'p-toc__link'
+        for anchor in item('a'):
+            anchor['class'] = 'p-toc__link'
 
-            nav_item_strings.append(str(item))
+        nav_item_strings.append(str(item))
 
-        metadata['toc_items'] = "\n".join(nav_item_strings)
+    metadata['toc_items'] = "\n".join(nav_item_strings)
 
     return template.render(metadata)
 
