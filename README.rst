@@ -71,3 +71,13 @@ To run tests:
 
     ./setup.py test
 
+Debugging
+*********
+
+To run a specific test:
+
+.. code:: bash
+
+    ./setup.py test --addopts tests/test_operations.py::test_find_files
+
+You can debug tests by [adding a debugger to the code](https://www.safaribooksonline.com/blog/2014/11/18/intro-python-debugger/) and running the test again.
