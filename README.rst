@@ -80,4 +80,4 @@ To run a specific test:
 
     ./setup.py test --addopts tests/test_operations.py::test_find_files
 
-You can debug tests by [adding a debugger to the code](https://www.safaribooksonline.com/blog/2014/11/18/intro-python-debugger/) and running the test again.
+You can debug tests by `adding a debugger to the code <https://www.safaribooksonline.com/blog/2014/11/18/intro-python-debugger/>`__ and running the test again.
