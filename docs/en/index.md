@@ -8,6 +8,9 @@ Getting started with documentation-builder
 documentation-builder is a tool for building a set of HTML documentation
 from a remote git repository containing markdown files.
 
+!!! Information:
+    A machine destined for MAAS will have its disk space overwritten.
+
 Installation
 ---
 

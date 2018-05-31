@@ -118,6 +118,7 @@ class NotificationsProcessor(BlockProcessor):
                 'warning': 'p-notification--caution',
                 'positive': 'p-notification--positive',
                 'negative': 'p-notification--negative',
+                'information': 'p-notification--information',
             }
 
             markup = template.render(
