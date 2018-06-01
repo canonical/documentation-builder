@@ -40,7 +40,7 @@ class NotificationsExtension(Extension):
           </p>
         </div>
 
-        <div class="p-notification--warning">
+        <div class="p-notification--caution">
           <p class="p-notification__response">
             <span class="p-notification__line">I have no title</span>
           </p>
@@ -115,9 +115,10 @@ class NotificationsProcessor(BlockProcessor):
             notification_type, title = self.get_type_and_title(match)
 
             type_classes = {
-                'warning': 'p-notification--warning',
+                'warning': 'p-notification--caution',
                 'positive': 'p-notification--positive',
                 'negative': 'p-notification--negative',
+                'information': 'p-notification--information',
             }
 
             markup = template.render(
