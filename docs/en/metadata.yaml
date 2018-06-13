@@ -5,7 +5,9 @@ navigation:
     - title: How to structure documentation
       location: structure.md
 
+    - title: Homepage template
+      location: homepage-template.md
+
     - title: Project repository
       location: https://github.com/canonical-webteam/documentation-builder
       external: true
-
