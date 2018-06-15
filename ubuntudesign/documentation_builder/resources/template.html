@@ -226,17 +226,6 @@
               </li>
               {% endfor %}
             </ul>
-            <ul class="p-sidebar-nav__list u-hide" id="docs-list-sorted">
-              {% for item in navigation %}{% for child in item.children %}
-                <li class="p-sidebar-nav__item">
-                  {% if child.location %}
-                    <a class="p-link--soft" href="{{ child.location }}">{{ child.title }}</a>
-                  {% else %}
-                    {{ child.title }}
-                  {% endif %}
-                </li>
-              {% endfor %}{% endfor %}
-            </ul>
           </nav>
         </div>
       </aside>
@@ -254,7 +243,18 @@
         <footer class="p-footer" role="contentinfo">
           <div class="p-content__row u-no-margin--left">
             <div class="col-12">
-              <p>&copy; 2018 Canonical Ltd. Ubuntu and Canonical are registered trademarks of Canonical Ltd.</p>
+              <p>
+                {% if site_footer_text %}{{ site_footer_text }}
+                {% else %}&copy; 2018 Canonical Ltd. Ubuntu and Canonical are registered trademarks of Canonical Ltd.
+                {% endif %}
+              </p>
+              {% if site_footer_links %}
+              <ul class="p-inline-list--middot u-no-margin--bottom">
+                {% for link in site_footer_links %}
+                <li class="p-inline-list__item"><a href="{{ link.location }}">{{ link.title }}</a></li>
+                {% endfor %}
+              </ul>
+              {% endif %}
             </div>
           </div>
         </footer>
@@ -287,7 +287,12 @@
       var links = document.querySelectorAll('a');
       links.forEach(function(link) {
         var parentClass = link.parentNode.classList;
-        var ignoreNav = !(parentClass.contains('p-navigation__logo') || parentClass.contains('p-navigation__link') || parentClass.contains('p-sidebar-nav__item'));
+        var ignoreNav = !(
+          parentClass.contains('p-navigation__logo') ||
+          parentClass.contains('p-navigation__link') ||
+          parentClass.contains('p-sidebar-nav__item') ||
+          parentClass.contains('p-inline-list__item')
+        );
         if (link.hostname && link.hostname != location.hostname && ignoreNav) {
           link.className += ' p-link--external';
         }
