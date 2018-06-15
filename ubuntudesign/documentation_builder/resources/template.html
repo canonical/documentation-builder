@@ -226,17 +226,6 @@
               </li>
               {% endfor %}
             </ul>
-            <ul class="p-sidebar-nav__list u-hide" id="docs-list-sorted">
-              {% for item in navigation %}{% for child in item.children %}
-                <li class="p-sidebar-nav__item">
-                  {% if child.location %}
-                    <a class="p-link--soft" href="{{ child.location }}">{{ child.title }}</a>
-                  {% else %}
-                    {{ child.title }}
-                  {% endif %}
-                </li>
-              {% endfor %}{% endfor %}
-            </ul>
           </nav>
         </div>
       </aside>
@@ -260,7 +249,7 @@
                 {% endif %}
               </p>
               {% if site_footer_links %}
-              <ul class="p-inline-list--middot">
+              <ul class="p-inline-list--middot u-no-margin--bottom">
                 {% for link in site_footer_links %}
                 <li class="p-inline-list__item"><a href="{{ link.location }}">{{ link.title }}</a></li>
                 {% endfor %}
