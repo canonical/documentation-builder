@@ -11,6 +11,9 @@ navigation:
         - title: Base template
           location: homepage-examples/default.md
 
+        - title: Snap Enterprise Proxy
+          location: homepage-examples/enterprise-proxy-example.md
+
     - title: Project repository
       location: https://github.com/canonical-webteam/documentation-builder
       external: true
