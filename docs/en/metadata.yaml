@@ -17,6 +17,9 @@ navigation:
         - title: Juju
           location: homepage-examples/juju-example.md
 
+        - title: conjure-up
+          location: homepage-examples/conjure-up-example.md
+
         - title: Snap Enterprise Proxy
           location: homepage-examples/enterprise-proxy-example.md
 
