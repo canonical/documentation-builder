@@ -166,7 +166,6 @@ def parse_markdown(parser, template, filepath, metadata):
             """
             print("Error parsing file: {}".format(filepath))
             raise
-         
 
     # Now add on any multimarkdown-format metadata
     if hasattr(parser, 'Meta'):
