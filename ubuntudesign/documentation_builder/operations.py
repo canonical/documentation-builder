@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 from git import Repo
 from yaml.scanner import ScannerError
 from yaml.parser import ParserError
-
+from xml.etree.ElementTree import ParseError
 # Local modules
 from .utilities import (
     cache_dir,
@@ -159,6 +159,14 @@ def parse_markdown(parser, template, filepath, metadata):
             """
 
             metadata['content'] = parser.convert(file_content)
+        except ParseError:
+            """
+            If there is a parse error in a file, it is useful to know
+            which file it is
+            """
+            print("Error parsing file: {}".format(filepath))
+            raise
+         
 
     # Now add on any multimarkdown-format metadata
     if hasattr(parser, 'Meta'):
