@@ -164,9 +164,9 @@ def parse_markdown(parser, template, filepath, metadata):
             If there is a parse error in a file, it is useful to know
             which file it is
             """
+            
             print("Error parsing file: {}".format(filepath))
-            raise
-         
+            raise     
 
     # Now add on any multimarkdown-format metadata
     if hasattr(parser, 'Meta'):
