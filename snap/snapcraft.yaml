@@ -11,15 +11,14 @@ parts:
   repo:
     plugin: python
     source: .
+    stage-packages:
+      - git
   copy:
     plugin: dump
     source: .
-  git:
-    plugin: autotools
-    source: https://github.com/git/git/archive/v2.10.2.tar.gz
 
 apps:
   documentation-builder:
     plugs:
-        - home
+      - home
     command: documentation-builder
