@@ -17,3 +17,4 @@ tests/fixtures/builder/base-repo/
 .coverage
 htmlcov/
 env*/
+.snapcraft
