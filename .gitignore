@@ -18,3 +18,4 @@ tests/fixtures/builder/base-repo/
 htmlcov/
 env*/
 .snapcraft
+*.tar.bz2
