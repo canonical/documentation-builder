@@ -590,9 +590,18 @@ def test_set_active_navigation_items():
 def test_version_paths():
     function_fixtures = path.join(fixtures_path, 'version_paths')
     version_branches = {
-        '1.8': {'base_directory': path.join(function_fixtures, '1.8')},
-        '1.9': {'base_directory': path.join(function_fixtures, '1.9')},
-        'master': {'base_directory': path.join(function_fixtures, 'master')}
+        '1.8': {
+            'base_directory': path.join(function_fixtures, '1.8'),
+            'order': 2
+        },
+        '1.9': {
+            'base_directory': path.join(function_fixtures, '1.9'),
+            'order': 1
+        },
+        'master': {
+            'base_directory': path.join(function_fixtures, 'master'),
+            'order': 0
+        }
     }
     relative_filepath = path.join('en', 'subfolder', 'index.md')
 
@@ -603,11 +612,12 @@ def test_version_paths():
         relative_filepath=relative_filepath
     )
 
-    assert paths[0] == {'name': '1.8', 'path': None}
-    assert paths[1] == {'name': '1.9', 'path': ''}
+    assert paths[0] == {'name': '1.8', 'path': None, 'latest': False}
+    assert paths[1] == {'name': '1.9', 'path': '', 'latest': False}
     assert paths[2] == {
         'name': 'master',
-        'path': '../../../master/en/subfolder/index.md'
+        'path': '../../../master/en/subfolder/index.md',
+        'latest': True
     }
 
 

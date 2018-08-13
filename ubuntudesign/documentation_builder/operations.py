@@ -215,6 +215,7 @@ def prepare_version_branches(base_directory, output_base):
 
     builder_cache = cache_dir('documentation-builder')
 
+    order = 0
     for name in version_branch_names:
         branch_base_directory = tempfile.mkdtemp(dir=builder_cache)
 
@@ -229,8 +230,11 @@ def prepare_version_branches(base_directory, output_base):
         Repo.clone_from(base_directory, branch_base_directory, branch=name)
         version_branches[name] = {
             'base_directory': branch_base_directory,
-            'output_path': path.join(output_base, name)
+            'output_path': path.join(output_base, name),
+            'order': order
         }
+
+        order = order + 1
 
     return version_branches
 
@@ -371,6 +375,8 @@ def version_paths(
 
     version_filepaths = []
 
+    order_latest_name = ""
+    order_latest_index = -1
     for name, info in sorted(version_branches.items()):
         version_relative_filepath = path.relpath(
             path.join('..', name, relative_filepath),
@@ -389,10 +395,24 @@ def version_paths(
         else:
             version_filepath = None
 
+        if version_filepath is not None:
+            if order_latest_index == -1:
+                order_latest_index = info['order']
+                order_latest_name = name
+            elif info['order'] < order_latest_index:
+                order_latest_index = info['order']
+                order_latest_name = name
+
         version_filepaths.append({
             'name': name,
-            'path': version_filepath
+            'path': version_filepath,
+            'latest': False
         })
+
+    if order_latest_index > -1:
+        for version_filepath in version_filepaths:
+            if version_filepath["name"] == order_latest_name:
+                version_filepath["latest"] = True
 
     return version_filepaths
 
