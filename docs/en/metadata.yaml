@@ -20,8 +20,8 @@ navigation:
         - title: conjure-up
           location: homepage-examples/conjure-up-example.md
 
-        - title: Snap Enterprise Proxy
-          location: homepage-examples/enterprise-proxy-example.md
+        - title: Snap Store Proxy
+          location: homepage-examples/snap-store-proxy-example.md
 
     - title: Project repository
       location: https://github.com/canonical-webteam/documentation-builder
