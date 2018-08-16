@@ -1,13 +1,13 @@
 ---
-title: Snap Enterprise Proxy example
+title: Snap Store Proxy example
 homepage: true
 ---
 
 <div class="p-strip--image" style="background-image: url('https://assets.ubuntu.com/v1/4a3a6943-background.png')">
     <div class="p-content__row">
         <div class="col-8">
-            <h1>What is Snap Enterprise Proxy</h1>
-            <p>The Snap Enterprise Proxy provides an on-premise proxy to the Snap Store for your snap-enabled devices. Managed through a command-line client or a RESTful API, it provides:</p>
+            <h1>What is Snap Store Proxy</h1>
+            <p>The Snap Store Proxy provides an on-premise proxy to the Snap Store for your snap-enabled devices. Managed through a command-line client or a RESTful API, it provides:</p>
         </div>
     </div>
     <div class="p-content__row">
@@ -55,7 +55,7 @@ homepage: true
             <h2>What's new</h2>
             <ul class="p-list">
                 <li class="p-list__item"><a class="p-link--external" href="#">Overrides API - JSON response schema update</a></li>
-                <li class="p-list__item"><a class="p-link--external" href="#">Tutorial - How to register a Snap Enterprise Proxy with the Snap Store</a></li>
+                <li class="p-list__item"><a class="p-link--external" href="#">Tutorial - How to register a Snap Store Proxy with the Snap Store</a></li>
                 <li class="p-list__item"><a class="p-link--external" href="#">Troubleshooting - Steps updated to use 'snap logs'</a></li>
             </ul>
         </div>
