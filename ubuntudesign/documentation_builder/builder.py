@@ -234,6 +234,10 @@ class Builder():
                     relative_filepath
                 )
 
+                for version in metadata['versions']:
+                    if version['latest']:
+                        metadata['latest_version'] = version['path']
+
             html = parse_markdown(
                 self.parser,
                 self.template,
