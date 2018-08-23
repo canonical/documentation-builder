@@ -417,6 +417,13 @@ def version_paths(
     return version_filepaths
 
 
+def convert_path_to_html(path):
+    path = path.replace('.md', '')
+    path = path.replace('index', '')
+
+    return path
+
+
 def write_html(html, output_filepath):
 
     """
