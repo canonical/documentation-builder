@@ -27,7 +27,8 @@ from .operations import (
     prepare_version_branches,
     set_active_navigation_items,
     version_paths,
-    write_html
+    write_html,
+    convert_path_to_html
 )
 from .extensions import NotificationsExtension
 
@@ -236,7 +237,11 @@ class Builder():
 
                 for version in metadata['versions']:
                     if version['latest']:
-                        metadata['latest_version'] = version['path']
+                        metadata['relative_canonical'] = version['path']
+                        metadata['base_canonical'] = convert_path_to_html(
+                            version['name'] + '/' + relative_filepath)
+            else:
+                metadata['base_canonical'] = convert_path_to_html(filepath)
 
             html = parse_markdown(
                 self.parser,

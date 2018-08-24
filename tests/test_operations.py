@@ -14,6 +14,7 @@ from jinja2 import Template
 # Local modules
 from ubuntudesign.documentation_builder.operations import (
     compile_metadata,
+    convert_path_to_html,
     copy_media,
     find_files,
     find_metadata,
@@ -612,13 +613,33 @@ def test_version_paths():
         relative_filepath=relative_filepath
     )
 
-    assert paths[0] == {'name': '1.8', 'path': None, 'latest': False}
-    assert paths[1] == {'name': '1.9', 'path': '', 'latest': False}
+    assert paths[0] == {
+        'name': '1.8',
+        'path': None,
+        'latest': False,
+    }
+    assert paths[1] == {
+        'name': '1.9',
+        'path': '',
+        'latest': False,
+    }
     assert paths[2] == {
         'name': 'master',
         'path': '../../../master/en/subfolder/index.md',
-        'latest': True
+        'latest': True,
     }
+
+
+def test_convert_path_to_html():
+    path = "path/to/index.md"
+
+    new_path = convert_path_to_html(path)
+    assert new_path == 'path/to/'
+
+    path = "path/to/toto.md"
+
+    new_path = convert_path_to_html(path)
+    assert new_path == 'path/to/toto'
 
 
 def test_write_html():
