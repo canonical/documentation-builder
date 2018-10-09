@@ -1,6 +1,14 @@
 Ubuntu documentation builder
 ============================
 
+---
+
+**Maintenance mode**: `documentation-builder` is now considered a legacy product, as all user maintained documentation sets should now be moving to the [discourse-docs model](https://github.com/canonical-webteam/practices/blob/master/solutions/documentation.md#community-documentation).
+
+Important fixes will still be performed, but we will not be adding new features.
+
+---
+
 .. image:: https://travis-ci.org/CanonicalLtd/documentation-builder.svg?branch=master
    :alt: build status
    :target: https://travis-ci.org/CanonicalLtd/documentation-builder
@@ -8,7 +16,6 @@ Ubuntu documentation builder
 .. image:: https://coveralls.io/repos/github/CanonicalLtd/documentation-builder/badge.svg?branch=master
    :alt: code coverage
    :target: https://coveralls.io/github/CanonicalLtd/documentation-builder
-
 
 A tool for building a set of documentation files in HTML format, from a
 remote git repository containing markdown files.
