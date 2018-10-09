@@ -4,7 +4,7 @@ Ubuntu documentation builder
 Maintenance mode
 ----------------
 
-`documentation-builder` is now considered a legacy product, as all user maintained documentation sets should now be moving to the [discourse-docs model](https://github.com/canonical-webteam/practices/blob/master/solutions/documentation.md#community-documentation).
+`documentation-builder` is now considered a legacy product, as all user maintained documentation sets should now be moving to the `discourse-docs model <https://github.com/canonical-webteam/practices/blob/master/solutions/documentation.md#community-documentation>`__.
 
 Important fixes will still be performed, but we will not be adding new features.
 
