@@ -38,7 +38,7 @@ setup(
         "python-frontmatter==0.2.1",
         "pygments==2.2.0",
         "PyYAML==3.12",
-        "beautifulsoup4==4.5.1",
+        "beautifulsoup4==4.7.1",
         "markdown_urlize==0.2.0",
     ],
     setup_requires=['pytest-runner'],
