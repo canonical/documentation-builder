@@ -35,7 +35,7 @@ setup(
         "Markdown==2.6.6",
         "mdx-anchors-away==1.0.1",
         "mdx-foldouts==1.0.0",
-        "python-frontmatter==0.2.1",
+        "python-frontmatter==0.4.5",
         "pygments==2.2.0",
         "PyYAML==3.12",
         "beautifulsoup4==4.5.1",
