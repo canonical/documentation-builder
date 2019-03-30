@@ -1,3 +1,9 @@
+    **Archived**
+    
+    This project is legacy and should not be used for new documentation. Existing documentation projects using it should be migrated to `the Discourse model <https://canonical-webteam.github.io/practices/project-structure/documentation.html#community-documentation>`_, or use another solution. If you manage such a project, please reach out to us to facilitate the upgrade.
+    
+----
+
 Ubuntu documentation builder
 ============================
 
