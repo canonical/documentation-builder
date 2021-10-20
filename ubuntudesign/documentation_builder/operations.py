@@ -14,13 +14,14 @@ from git import Repo
 from yaml.scanner import ScannerError
 from yaml.parser import ParserError
 from xml.etree.ElementTree import ParseError
+
 # Local modules
 from .utilities import (
     cache_dir,
     matching_metadata,
     mergetree,
     relativize,
-    replace_link_paths
+    replace_link_paths,
 )
 
 
@@ -28,12 +29,8 @@ def compile_metadata(metadata_items, context_path):
     metadata = {}
 
     for dirpath, item in matching_metadata(metadata_items, context_path):
-        metadata_tree = deepcopy(item['content'])
-        metadata_tree = relativize_paths(
-            metadata_tree,
-            dirpath,
-            context_path
-        )
+        metadata_tree = deepcopy(item["content"])
+        metadata_tree = relativize_paths(metadata_tree, dirpath, context_path)
         metadata.update(metadata_tree)
 
     return metadata
@@ -44,7 +41,7 @@ def copy_media(media_path, output_media_path):
     Copy media files from source_media_path to output_media_path
     """
 
-    media_paths_match = path.relpath(media_path, output_media_path) == '.'
+    media_paths_match = path.relpath(media_path, output_media_path) == "."
 
     if not media_paths_match:
         mergetree(media_path, output_media_path)
@@ -67,20 +64,18 @@ def find_files(source_path, output_path, metadata_items):
     unmodified_files = []
 
     for filepath in iglob(
-        path.normpath(path.join(source_path, '**/*.md')),
-        recursive=True
+        path.normpath(path.join(source_path, "**/*.md")), recursive=True
     ):
         local_filepath = path.relpath(filepath, source_path)
         local_dir = path.normpath(path.dirname(local_filepath))
         filename = path.basename(filepath)
         name = path.splitext(filename)[0]
 
-        output_filepath = path.join(
-            output_path,
-            path.join(local_dir, name)
-        ) + '.html'
+        output_filepath = (
+            path.join(output_path, path.join(local_dir, name)) + ".html"
+        )
 
-        if re.sub(r'\W+', '', name).isupper():
+        if re.sub(r"\W+", "", name).isupper():
             uppercase_files.append(filepath)
         elif not path.isfile(output_filepath):
             new_files.append(filepath)
@@ -88,10 +83,7 @@ def find_files(source_path, output_path, metadata_items):
             metadata_modified = 0
 
             for dirpath, item in matching_metadata(metadata_items, local_dir):
-                metadata_modified = max(
-                    metadata_modified,
-                    item['modified']
-                )
+                metadata_modified = max(metadata_modified, item["modified"])
 
             # Check if the file is modified
             modified = max(metadata_modified, path.getmtime(filepath))
@@ -119,20 +111,23 @@ def find_metadata(directory_path):
     metadata_items = {}
 
     files_match = path.normpath(
-        '{root}/**/metadata.yaml'.format(root=directory_path)
+        "{root}/**/metadata.yaml".format(root=directory_path)
     )
     files = glob(files_match, recursive=True)
 
     if not files:
-        raise EnvironmentError('No metadata.yaml files found')
+        raise EnvironmentError("No metadata.yaml files found")
 
     for filepath in files:
         with open(filepath) as metadata_file:
             filedir = path.normpath(path.dirname(filepath))
             directory = path.relpath(filedir, directory_path)
             metadata_items[directory] = {
-                'modified': path.getmtime(filepath),
-                'content': yaml.load(metadata_file.read()) or {}
+                "modified": path.getmtime(filepath),
+                "content": yaml.load(
+                    metadata_file.read(), Loader=yaml.FullLoader
+                )
+                or {},
             }
 
     return metadata_items
@@ -149,7 +144,7 @@ def parse_markdown(parser, template, filepath, metadata):
         try:
             file_parts = frontmatter.loads(file_content)
             metadata.update(file_parts.metadata)
-            metadata['content'] = parser.convert(file_parts.content)
+            metadata["content"] = parser.convert(file_parts.content)
         except (ScannerError, ParserError):
             """
             If there's a parsererror, it's because frontmatter had to parse
@@ -158,7 +153,7 @@ def parse_markdown(parser, template, filepath, metadata):
             This means the file has no frontmatter, so we can simply continue.
             """
 
-            metadata['content'] = parser.convert(file_content)
+            metadata["content"] = parser.convert(file_content)
         except ParseError:
             """
             If there is a parse error in a file, it is useful to know
@@ -169,7 +164,7 @@ def parse_markdown(parser, template, filepath, metadata):
             raise
 
     # Now add on any multimarkdown-format metadata
-    if hasattr(parser, 'Meta'):
+    if hasattr(parser, "Meta"):
         # Restructure markdown parser metadata to the same format as we expect
         markdown_meta = parser.Meta
 
@@ -179,23 +174,23 @@ def parse_markdown(parser, template, filepath, metadata):
 
         metadata.update(markdown_meta)
 
-    toc_soup = BeautifulSoup(parser.toc, 'html.parser')
+    toc_soup = BeautifulSoup(parser.toc, "html.parser")
 
     nav_item_strings = []
 
     # Only get <h2> items, to avoid getting crazy
-    for item in toc_soup.select('.toc > ul > li > ul > li'):
-        for child in item('ul'):
+    for item in toc_soup.select(".toc > ul > li > ul > li"):
+        for child in item("ul"):
             child.extract()
 
-        item['class'] = 'p-toc__item'
+        item["class"] = "p-toc__item"
 
-        for anchor in item('a'):
-            anchor['class'] = 'p-toc__link'
+        for anchor in item("a"):
+            anchor["class"] = "p-toc__link"
 
         nav_item_strings.append(str(item))
 
-    metadata['toc_items'] = "\n".join(nav_item_strings)
+    metadata["toc_items"] = "\n".join(nav_item_strings)
 
     return template.render(metadata)
 
@@ -209,11 +204,11 @@ def prepare_version_branches(base_directory, output_base):
 
     version_branches = {}
 
-    with open(path.join(base_directory, 'versions')) as versions_file:
+    with open(path.join(base_directory, "versions")) as versions_file:
         lines = versions_file.read().splitlines()
         version_branch_names = list(filter(None, lines))
 
-    builder_cache = cache_dir('documentation-builder')
+    builder_cache = cache_dir("documentation-builder")
 
     order = 0
     for name in version_branch_names:
@@ -224,14 +219,14 @@ def prepare_version_branches(base_directory, output_base):
         if name not in [branch.name for branch in base_repo.branches]:
             for remote in base_repo.remotes:
                 for ref in remote.refs:
-                    if ref.name.endswith('/' + name):
+                    if ref.name.endswith("/" + name):
                         base_repo.create_head(name, ref.name)
 
         Repo.clone_from(base_directory, branch_base_directory, branch=name)
         version_branches[name] = {
-            'base_directory': branch_base_directory,
-            'output_path': path.join(output_base, name),
-            'order': order
+            "base_directory": branch_base_directory,
+            "output_path": path.join(output_base, name),
+            "order": order,
         }
 
         order = order + 1
@@ -247,29 +242,21 @@ def relativize_paths(item, original_base_path, new_base_path):
 
     internal_link_match = r'^[^ "\']+.md(#|\?|$)'
 
-    original_base_path = original_base_path.strip('/')
-    new_base_path = new_base_path.strip('/')
+    original_base_path = original_base_path.strip("/")
+    new_base_path = new_base_path.strip("/")
 
     if isinstance(item, Mapping):
         for key, child in item.items():
             item[key] = relativize_paths(
-                child,
-                original_base_path,
-                new_base_path
+                child, original_base_path, new_base_path
             )
     elif isinstance(item, list):
         for index, child in enumerate(item):
             item[index] = relativize_paths(
-                child,
-                original_base_path,
-                new_base_path
+                child, original_base_path, new_base_path
             )
     elif isinstance(item, str) and re.match(internal_link_match, item):
-        item = relativize(
-            item,
-            original_base_path,
-            new_base_path
-        )
+        item = relativize(item, original_base_path, new_base_path)
 
     return item
 
@@ -288,27 +275,14 @@ def replace_internal_links(html, extensions=True):
 
     # Replace internal document links
     if extensions:
-        html = re.sub(
-            internal_link_match,
-            r'\1.html',
-            html
-        )
+        html = re.sub(internal_link_match, r"\1.html", html)
     else:
-        html = re.sub(
-            internal_link_match,
-            r'\1',
-            html
-        )
+        html = re.sub(internal_link_match, r"\1", html)
 
     return html
 
 
-def replace_media_links(
-    html,
-    old_path,
-    new_path,
-    context_directory='.'
-):
+def replace_media_links(html, old_path, new_path, context_directory="."):
     """
     Replace links to media with the new media location.
     Do this intelligently relative to the current directory of the file.
@@ -336,23 +310,19 @@ def set_active_navigation_items(filename, items, parents=[]):
     active_items = []
 
     for item in items:
-        location = item.get('location')
+        location = item.get("location")
 
         if location:
-            location_name = path.splitext(
-                path.normpath(location)
-            )[0]
+            location_name = path.splitext(path.normpath(location))[0]
 
             if location_name == name:
-                item['active'] = True
+                item["active"] = True
                 active_items = parents + [item]
                 break
 
-        if not active_items and item.get('children'):
+        if not active_items and item.get("children"):
             active_items = set_active_navigation_items(
-                filename,
-                item['children'],
-                parents + [item]
+                filename, item["children"], parents + [item]
             )
             if active_items:
                 break
@@ -361,10 +331,7 @@ def set_active_navigation_items(filename, items, parents=[]):
 
 
 def version_paths(
-    version_branches,
-    base_directory,
-    source_folder,
-    relative_filepath
+    version_branches, base_directory, source_folder, relative_filepath
 ):
     """
     Find the paths to versions of a file in other version branches.
@@ -379,17 +346,15 @@ def version_paths(
     order_latest_index = -1
     for name, info in sorted(version_branches.items()):
         version_relative_filepath = path.relpath(
-            path.join('..', name, relative_filepath),
-            path.dirname(relative_filepath)
+            path.join("..", name, relative_filepath),
+            path.dirname(relative_filepath),
         )
         version_filepath = path.join(
-            info['base_directory'],
-            source_folder,
-            relative_filepath
+            info["base_directory"], source_folder, relative_filepath
         )
 
-        if info['base_directory'] == base_directory:
-            version_filepath = ''
+        if info["base_directory"] == base_directory:
+            version_filepath = ""
         elif path.isfile(version_filepath):
             version_filepath = version_relative_filepath
         else:
@@ -397,17 +362,15 @@ def version_paths(
 
         if version_filepath is not None:
             if order_latest_index == -1:
-                order_latest_index = info['order']
+                order_latest_index = info["order"]
                 order_latest_name = name
-            elif info['order'] < order_latest_index:
-                order_latest_index = info['order']
+            elif info["order"] < order_latest_index:
+                order_latest_index = info["order"]
                 order_latest_name = name
 
-        version_filepaths.append({
-            'name': name,
-            'path': version_filepath,
-            'latest': False
-        })
+        version_filepaths.append(
+            {"name": name, "path": version_filepath, "latest": False}
+        )
 
     if order_latest_index > -1:
         for version_filepath in version_filepaths:
@@ -418,8 +381,8 @@ def version_paths(
 
 
 def convert_path_to_html(path):
-    path = path.replace('.md', '')
-    path = path.replace('index', '')
+    path = path.replace(".md", "")
+    path = path.replace("index", "")
 
     return path
 
@@ -431,14 +394,12 @@ def write_html(html, output_filepath):
     """
 
     # Check the extension is right
-    output_filepath = path.splitext(output_filepath)[0] + '.html'
+    output_filepath = path.splitext(output_filepath)[0] + ".html"
     output_dir = path.dirname(output_filepath)
 
     makedirs(output_dir, exist_ok=True)
 
-    with open(
-        output_filepath, mode="w", encoding="utf-8"
-    ) as output_file:
+    with open(output_filepath, mode="w", encoding="utf-8") as output_file:
         output_file.write(html)
 
     return output_filepath
