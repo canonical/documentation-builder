@@ -14,3 +14,4 @@ v1.6.0, 2018-06-14 -- Update base template to Vanilla 1.7.1 docs style + add hom
 v1.6.1, 2018-08-20 -- Add canonical links to generated pages
 v1.6.2, 2018-08-24 -- Add base_canonical variable for use in custom templates
 v1.6.3, 2019-05-08 -- Update the copyright year in the footer
+v1.6.4, 2021-10-20 -- Update pyyaml and gitpython
