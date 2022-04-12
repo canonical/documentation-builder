@@ -16,3 +16,4 @@ v1.6.2, 2018-08-24 -- Add base_canonical variable for use in custom templates
 v1.6.3, 2019-05-08 -- Update the copyright year in the footer
 v1.6.4, 2021-10-20 -- Update pyyaml and gitpython
 v1.6.5, 2021-10-20 -- GitPython 3.1.20 (works with more python versions)
+v1.6.6, 2022-04-12 -- Update dependencies
