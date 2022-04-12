@@ -14,7 +14,7 @@ assert sys.version_info >= (
 
 setup(
     name="ubuntudesign.documentation-builder",
-    version="1.6.5",
+    version="1.6.6",
     author="Canonical webteam",
     author_email="robin+pypi@canonical.com",
     url="https://github.com/ubuntudesign/documentation-builder",
@@ -29,15 +29,15 @@ setup(
     ),
     long_description=open("README.rst").read(),
     install_requires=[
-        "GitPython==3.1.20",
-        "Jinja2==2.8",
+        "GitPython==3.1.27",
+        "Jinja2==2.11.3",
         "Markdown==2.6.6",
         "mdx-anchors-away==1.0.1",
         "mdx-foldouts==1.0.0",
         "python-frontmatter==0.2.1",
-        "pygments==2.2.0",
+        "pygments==2.4.0",
         "PyYAML==6.0",
-        "beautifulsoup4==4.5.1",
+        "beautifulsoup4==4.10.0",
         "markdown_urlize==0.2.0",
     ],
     setup_requires=["pytest-runner"],
