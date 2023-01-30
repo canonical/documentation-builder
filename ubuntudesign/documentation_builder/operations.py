@@ -1,7 +1,7 @@
 # Core modules
 import re
 import tempfile
-from collections import Mapping
+from collections.abc import Mapping
 from copy import deepcopy
 from glob import glob, iglob
 from os import makedirs, path
