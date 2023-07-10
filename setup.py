@@ -39,7 +39,7 @@ setup(
         "PyYAML==6.0",
         "beautifulsoup4==4.11.1",
         "markdown_urlize==0.2.0",
-        "markupsafe==2.0.1"
+        "markupsafe==2.0.1",
     ],
     setup_requires=["pytest-runner"],
     tests_require=[
